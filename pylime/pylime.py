@@ -9,6 +9,139 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
+class DataFrame:
+    def __init__(self, data):
+        rawnames = data.dtype.names
+        self.single_names = []
+
+        self.vector_names = []
+        self.vector_masks = dict()
+        self.vector_indices = dict()
+        self.vector_dims = dict()
+
+        self.matrix_names = []
+        self.matrix_masks = dict()
+        self.matrix_indices = dict()
+        self.matrix_dims = dict()
+
+        self.data = np.atleast_1d(data)
+        self.nrows = self.data.shape[0]
+        self.ncols = len(self.data[0])
+
+
+        # Parse names and create masks
+        for idx, name in enumerate(rawnames):
+            splt = name.split("_")
+            
+            # Singles
+            if len(splt)==1:
+                self.single_names.append(name)
+
+            # Vectors
+            if len(splt)==2:
+                vec_name = splt[0]
+                try:
+                    vec_idx = int(splt[1])
+                except:
+                    raise ValueError("Invalid vector name format in PyLime")
+
+                if vec_name not in self.vector_names:
+                    self.vector_names.append(vec_name)
+                    self.vector_masks[vec_name] = np.zeros(len(rawnames), dtype=bool)
+                    self.vector_indices[vec_name] = []
+                self.vector_masks[vec_name][idx] = True
+                self.vector_indices[vec_name].append(vec_idx)
+
+            # Matrices
+            if len(splt)==3:
+                mat_name = splt[0]
+                try:
+                    mat_idx = (int(splt[1]), int(splt[2]))
+                except:
+                    raise ValueError("Invalid matrix name format in PyLime")
+
+                if mat_name not in self.matrix_names:
+                    self.matrix_names.append(mat_name)
+                    self.matrix_masks[mat_name] = np.zeros(len(rawnames), dtype=bool)
+                    self.matrix_indices[mat_name] = []
+                self.matrix_masks[mat_name][idx] = True
+                self.matrix_indices[mat_name].append(mat_idx)
+
+        # Get dimensions of array
+        for name in self.vector_names:
+            assert(np.count_nonzero(self.vector_masks[name]) == len(self.vector_indices[name]))
+            self.vector_dims[name] = (len(self.vector_indices[name]), )
+
+        for name in self.matrix_names:
+            assert(np.count_nonzero(self.matrix_masks[name]) == len(self.matrix_indices[name]))
+            idx0_arr = np.unique(np.array(self.matrix_indices[name])[:,0])
+            idx1_arr = np.unique(np.array(self.matrix_indices[name])[:,1])
+            self.matrix_dims[name] = (len(idx0_arr), len(idx1_arr))
+
+        self.all_names = self.single_names + self.vector_names + self.matrix_names
+
+    def subframe(self, begin, end=-1, step=1):
+        return DataFrame(self.data[begin:end:step])
+
+    def __str__(self):
+
+        return "PyLime dataframe.\n" + \
+             "  Single names: " + " ".join(self.single_names) + "\n" \
+             "  Vector names: " + " ".join(self.vector_names) + "\n" \
+             "  Matrix names: " + " ".join(self.matrix_names) + "\n" 
+    def __getitem__(self, name):
+        return self._get(name)
+
+    def _get(self, name):
+        if name in self.single_names:
+            return self.data[name]
+        else:
+            dataview = self.data.view(float).reshape((self.nrows, self.ncols))
+            if name in self.vector_names:
+                return dataview[:, self.vector_masks[name]]
+            elif name in self.matrix_names:
+                return dataview[:, self.matrix_masks[name]].reshape((self.nrows, 
+                                                                      self.matrix_dims[name][0], 
+                                                                      self.matrix_dims[name][1]))
+            else:
+                raise ValueError("Name \"{}\" not found in pylime dataframe!".format(name))
+
+    def append(self, frame):
+        if not isinstance(frame, DataFrame):
+            raise ValueError("Only DataFrame objects can be appended to data frame")
+
+        # Check whether DataFrames are compatible
+        if self.single_names != frame.single_names or \
+           self.vector_names != frame.vector_names or \
+            np.array_equal(self.vector_masks, frame.vector_masks) or \
+            self.vector_indices != frame.vector_indices or \
+            self.vector_dims != frame.vector_dims or \
+            self.matrix_names != frame.matrix_names or \
+            np.array_equal(self.matrix_masks, frame.matrix_masks) or \
+            self.matrix_indices != frame.matrix_indices or \
+            self.matrix_dims != frame.matrix_dims:
+
+            raise ValueError("Cannot append: Incompatible DataFrames")
+
+        self.data = np.append(self.data, frame.data)
+        self.nrows = self.data.shape[0]
+        self.ncols = len(self.data[0])
+
+def combine_data_frames(list_of_data_frames):
+    if not isinstance(list_of_data_frames, list):
+        raise ValueError("Cannot combine dataframe: Need a list!")
+        
+    comb = list_of_data_frames[0]
+    for i in range(1, len(list_of_data_frames), 1):
+        comb.append(list_of_data_frames[i])
+    return comb
+
+def read(filename, dtype=float):
+    data = np.genfromtxt(filename, dtype=dtype, delimiter=" ", names=True, comments="# ")
+    return DataFrame(data)
+
+
+
 def resample_bin(array, binsize=1, axis=0):
     """ Resample a given array into bins 
     
@@ -21,6 +154,8 @@ def resample_bin(array, binsize=1, axis=0):
     """
     if not isinstance(array, np.ndarray):
         raise ValueError("array not of type numpy.array")
+    if binsize > len(array):
+        raise ValueError("binsize larger than length of array")
     return array[:(array.size // binsize) * binsize].reshape(-1, binsize).mean(axis=1)
 
 def resample_jackknife(array, axis=0):
@@ -35,17 +170,61 @@ def resample_jackknife(array, axis=0):
     """
     if not isinstance(array, np.ndarray):
         raise ValueError("array not of type numpy.array")
-    A_resampled = np.zeros_like(A)
-    n_seeds = A.shape[0]
+    A_resampled = np.zeros_like(array)
+    n_seeds = array.shape[axis]
     for seed in range(n_seeds):
-        A_resampled[seed,:] = np.mean(np.delete(A, seed, axis=0), axis=0)
+        A_resampled[seed] = np.mean(np.delete(array, seed, axis=axis), axis=axis)
     return A_resampled
 
-def err(array, axis=0):
-    """ Compute standard error of a given sample """
-    return stats.sem(array, axis)
+def mean(array, axis=0):
+    return np.mean(array, axis=axis)
 
-def plot_binning(array, maxk_offset=5, **kwargs):
+def std(array, axis=0, ddof=0):
+    return np.std(array, axis=axis, ddof=ddof)
+
+def sem(array, axis=0, ddof=0):
+    return stats.sem(array, axis=axis, ddof=ddof)
+
+def add_sem(e1, e2):
+    return np.sqrt(e1**2 + e2**2)
+
+def mult_sem(m1, e1, m2, e2):
+    m = m1 * m2
+    return np.sqrt(m**2 * ( (e1/m1)**2 + (e2/m2)**2))
+
+def div_sem(m1, e1, m2, e2):
+    m = m1 / m2
+    return np.sqrt(m**2 * ( (e1/m1)**2 + (e2/m2)**2))
+
+def sem_jackknife(array, axis=0, ddof=0):
+    n = array.shape[axis]
+    return np.sqrt(n-1) * stats.sem(array, axis=axis, ddof=ddof)
+
+def err(array, axis=0, ddof=0, binidx=-1):
+    """ Compute standard error of a given sample """
+    if binidx < 0:
+        binidx = binning_depth(array)
+    binsize = 2**binidx
+    array_bins = resample_bin(array, binsize)
+    return stats.sem(array_bins, axis=axis, ddof=ddof)
+
+def tau(array):
+    """ Compute autocorrelation """
+    binidx = binning_depth(array)
+    if binidx >= 2:
+        er = err(array)
+        er0 = err(array, binidx=0)
+        return (er**2)/(er0**2)
+    else:
+        return 0
+
+def binning_depth(array, maxk_offset=4):
+    if not isinstance(array, np.ndarray):
+        raise ValueError("array not of type numpy.array")
+    return max(0, int(np.floor(np.log2(len(array)))) - maxk_offset)
+
+
+def plot_binning(array, maxk_offset=3, **kwargs):
     """ Produce a plot showing how the error evolves as function of binsize """
     
     maxk = int(np.floor(np.log2(len(array)))) - maxk_offset

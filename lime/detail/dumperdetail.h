@@ -17,6 +17,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 
@@ -53,7 +54,7 @@ namespace lime
 
       // Check whether all timeseries have the same length
       for (auto key_timeseries : collection)
-	assert(timeseries_size == key_timeseries.second.size());	 
+	assert(timeseries_size == (int)key_timeseries.second.size());	 
     
       // Write the header
       if (write_header && (previous_dump == 0))

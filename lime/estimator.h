@@ -15,6 +15,9 @@
 #ifndef LIME_ESTIMATOR_H
 #define LIME_ESTIMATOR_H
 
+#include <vector>
+#include <cassert>
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <limits>

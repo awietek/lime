@@ -20,7 +20,7 @@ using namespace std;
 /*  Jonathan Goodman, March 2009, goodman@cims.nyu.edu  */
 namespace lime { namespace acor {
 
-    int acor( double *mean, double *sigma, double *tau, double X[], int L){
+    inline int acor( double *mean, double *sigma, double *tau, double X[], int L){
    
       *mean = 0.;                                   // Compute the mean of X ... 
       for ( int i = 0; i < L; i++) *mean += X[i];

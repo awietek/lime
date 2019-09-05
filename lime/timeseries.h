@@ -16,6 +16,7 @@
 #define LIME_TIMESERIES_H
 
 #include <algorithm>
+#include <numeric>
 
 #include <lime/complex.h>
 #include <lime/acor.h>
