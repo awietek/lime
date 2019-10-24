@@ -36,6 +36,8 @@ namespace lime
 
 
   public:
+    using data_t = coeff_t;
+
     Timeseries() = default;
     Timeseries(const vector_t& series);
     uint64 size() const;
@@ -47,6 +49,7 @@ namespace lime
 
     void operator<<(const coeff_t& x);
     coeff_t& operator[](const int& idx);
+    const coeff_t& operator[](const int& idx) const;
 
     iterator_t begin() { return series_.begin(); }
     iterator_t end() { return series_.end(); }
@@ -54,6 +57,9 @@ namespace lime
     const_iterator_t end() const { return series_.end(); }
     const_iterator_t cbegin() const { return series_.cbegin(); }
     const_iterator_t cend() const { return series_.cend(); }
+
+    coeff_t* data() { return series_.data();}
+    const coeff_t* data() const { return series_.data();}
 
   private:
     vector_t series_;    
@@ -127,6 +133,10 @@ namespace lime
 
   template <class coeff_t>
   coeff_t& Timeseries<coeff_t>::operator[](const int& idx)
+  { return series_[idx]; }
+
+  template <class coeff_t>
+  const coeff_t& Timeseries<coeff_t>::operator[](const int& idx) const
   { return series_[idx]; }
 }
 

@@ -20,7 +20,7 @@
 #include <string>
 
 #include <lime/collection.h>
-#include <lime/detail/dumperdetail.h>
+#include <lime/detail/dumper_detail.h>
 
 namespace lime
 {

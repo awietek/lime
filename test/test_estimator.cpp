@@ -24,7 +24,7 @@ TEST_CASE( "Basic estimator test", "[estimator]" ) {
     std::mt19937 gen{rd()};
     std::normal_distribution<> d{0,1};
  
-    lime::estimator<> est;
+    lime::Estimator<> est;
     for (int i = 0; i < 10000; ++i)
       est << d(gen);
 
