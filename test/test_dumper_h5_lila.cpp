@@ -26,14 +26,16 @@
 template <class coeff_t>
 void test_write_timeseries_lila()
 {    
+  // Check vector functionality
+  {
   using vec_t = lila::Vector<coeff_t>;
-  int size = 2;
+  int size = 5;
 
   lime::Timeseries<vec_t> timeseries;
   auto dumper = lime::makeDumperH5(timeseries, "dump.hdf5");
-  for (int k = 0; k < 1; ++k)
+  for (int k = 0; k < 2; ++k)
     {
-      for (int i = 0; i < 1; ++i)
+      for (int i = 0; i < 3; ++i)
   	{
   	  auto vec = lila::Random<coeff_t>(size);
   	  // LilaPrint(vec);
@@ -50,7 +52,7 @@ void test_write_timeseries_lila()
   // Check, whether timeseries after IO is still the same
   REQUIRE(timeseries.size() == timeseries2.size());
   REQUIRE(timeseries.size() == timeseries3.size());
-  for (int i=0; i<timeseries.size(); ++i)
+  for (int i=0; i<(int)timeseries.size(); ++i)
     {
       for(int m=0; m<timeseries[i].size(); ++m)
   	{
@@ -58,6 +60,45 @@ void test_write_timeseries_lila()
   	  REQUIRE(timeseries[i](m) == timeseries3[i](m));
   	}
     }
+  }
+
+  // Check matrix funcitonality
+  {
+    using mat_t = lila::Matrix<coeff_t>;
+    int nrows = 3;
+    int ncols = 4;
+
+    lime::Timeseries<mat_t> timeseries;
+    auto dumper = lime::makeDumperH5(timeseries, "dump.hdf5");
+    for (int k = 0; k < 2; ++k)
+      {
+	for (int i = 0; i < 2; ++i)
+	  {
+	    auto mat = lila::Random<coeff_t>(nrows, ncols);
+	    // LilaPrint(mat);
+	    timeseries << mat;
+	  }
+	dumper.dump();
+      }
+
+    // Write using normal write function and read again
+    lime::writeh5(timeseries, "dump2.hdf5");
+    auto timeseries2 = lime::readh5<mat_t>("dump.hdf5");
+    auto timeseries3 = lime::readh5<mat_t>("dump2.hdf5");  
+
+    // Check, whether timeseries after IO is still the same
+    REQUIRE(timeseries.size() == timeseries2.size());
+    REQUIRE(timeseries.size() == timeseries3.size());
+    for (int i=0; i<(int)timeseries.size(); ++i)
+      {
+	for(int m=0; m<nrows; ++m)
+	  for(int n=0; n<ncols; ++n)
+	    {
+	      REQUIRE(timeseries[i](m, n) == timeseries2[i](m, n));
+	      REQUIRE(timeseries[i](m, n) == timeseries3[i](m, n));
+	    }
+      }
+  }
 }
 
 TEST_CASE( "hdf5dumper lila test", "[hdf5dumperlila]" ) {

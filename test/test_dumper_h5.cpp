@@ -33,9 +33,9 @@ void test_write_timeseries()
 
   // Create timeseries and write using dumper
   auto dumper = lime::makeDumperH5(timeseries, "dump.hdf5");
-  for (int k = 0; k < 2000; ++k)
+  for (int k = 0; k < 10; ++k)
     {
-      for (int i = 0; i < 2000; ++i)
+      for (int i = 0; i < 10; ++i)
 	{
 	  coeff_t val = testutils::rdm<coeff_t>(gen);
 	  timeseries << val;
@@ -44,17 +44,14 @@ void test_write_timeseries()
     }
 
   // // Write using normal write function and read again
-  printf("here\n");
   lime::writeh5(timeseries, "dump2.hdf5");
-  printf("athere\n");
   auto timeseries2 = lime::readh5<coeff_t>("dump.hdf5");
   auto timeseries3 = lime::readh5<coeff_t>("dump2.hdf5");  
-  printf("there\n");
 
   // Check, whether timeseries after IO is still the same
   REQUIRE(timeseries.size() == timeseries2.size());
   REQUIRE(timeseries.size() == timeseries3.size());
-  for (int i=0; i<timeseries.size(); ++i)
+  for (int i=0; i<(int)timeseries.size(); ++i)
     {
       REQUIRE(timeseries[i] == timeseries2[i]);
       REQUIRE(timeseries[i] == timeseries3[i]);

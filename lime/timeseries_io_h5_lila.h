@@ -76,6 +76,63 @@ namespace lime
       (filename, tag); }
  
 
+
+
+
+  template <>
+  void writeh5<lila::Matrix<float>>
+  (const Timeseries<lila::Matrix<float>>& timeseries, 
+   std::string filename, std::string tag)
+  { 
+    detail::writeh5_timeseries_of_matrices<float>(timeseries, filename, tag);
+  }
+
+  template <>
+  void writeh5<lila::Matrix<double>>
+  (const Timeseries<lila::Matrix<double>>& timeseries, 
+   std::string filename, std::string tag)
+  { 
+    detail::writeh5_timeseries_of_matrices<double>(timeseries, filename, tag);
+  }
+  template <>
+  void writeh5<lila::Matrix<std::complex<float>>>
+  (const Timeseries<lila::Matrix<std::complex<float>>>& timeseries, 
+   std::string filename, std::string tag)
+  { 
+    detail::writeh5_timeseries_of_matrices<std::complex<float>>
+      (timeseries, filename, tag);
+  }
+  template <>
+  void writeh5<lila::Matrix<std::complex<double>>>
+  (const Timeseries<lila::Matrix<std::complex<double>>>& timeseries, 
+   std::string filename, std::string tag)
+  { 
+    detail::writeh5_timeseries_of_matrices<std::complex<double>>
+      (timeseries, filename, tag);
+  }
+
+
+  template <>
+  Timeseries<lila::Matrix<float>> readh5(std::string filename, std::string tag)
+  { return detail::readh5_timeseries_of_matrices<float>(filename, tag); }
+  template <>
+  Timeseries<lila::Matrix<double>> readh5(std::string filename, std::string tag)
+  { return detail::readh5_timeseries_of_matrices<double>(filename, tag); }
+  template <>
+  Timeseries<lila::Matrix<std::complex<float>>> readh5(std::string filename, 
+						       std::string tag)
+  { return detail::readh5_timeseries_of_matrices<std::complex<float>>
+      (filename, tag); }
+  template <>
+  Timeseries<lila::Matrix<std::complex<double>>> readh5(std::string filename, 
+							std::string tag)
+  { return detail::readh5_timeseries_of_matrices<std::complex<double>>
+      (filename, tag); }
+ 
+
+
+
+
 }
 
 #endif

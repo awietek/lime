@@ -90,7 +90,7 @@ namespace lime
     coeff_t mn = mean();
     vector_t series_normalized_ = series_;
     std::for_each(series_normalized_.begin(), series_normalized_.end(), 
-		  [](coeff_t& x) { x -= mean;});
+		  [&mn](coeff_t& x) { x -= mn;});
     
     // Compute the autocovariance
     vector_t autocov(maxtime, 0.0);

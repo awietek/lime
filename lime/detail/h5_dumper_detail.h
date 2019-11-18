@@ -45,6 +45,8 @@ namespace lime
       hid_t prop = H5Pcreate(H5P_DATASET_CREATE);
       herr_t status = H5Pset_chunk(prop, rank, chunk_dims);
       assert(status > -1);
+      // status = H5Pset_deflate(prop, 8);
+      // assert(status > -1);
       return prop;
     }
 
@@ -59,8 +61,6 @@ namespace lime
       assert(dataset_id > -1);
       return dataset_id;
     }
-
-
 
 
     template <class coeff_t>

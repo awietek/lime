@@ -3,3 +3,5 @@ doc/html
 pylime/__pycache__
 *.pyc
 *.o
+test/dump.hdf5
+test/dump2.hdf5
