@@ -17,7 +17,6 @@
 
 #include <vector>
 #include <string>
-#include <sstream>
 #include <unordered_map>
 
 namespace lime {
@@ -32,8 +31,8 @@ namespace lime {
   public:
     Collection() = default;
     
-    estimator_t operator[](const key_t& key) const;
-    estimator_t& operator[](const key_t& key);
+    // estimator_t operator[](key_t const& key) const;
+    estimator_t& operator[](key_t const& key);
     std::vector<key_t> keys() const { return keys_; }
 
     iterator_t begin() { return keys_estimators_.begin(); }
@@ -47,27 +46,6 @@ namespace lime {
     std::vector<key_t> keys_;
     container_t keys_estimators_;
   };
-
-  template <class key_t, class estimator_t>
-  estimator_t Collection<key_t, estimator_t>::operator[](const key_t& key) const
-  {
-    // Try to insert (returns iterator to element if already present)
-    auto r = keys_estimators_.insert({key, estimator_t()});
-
-    // if key does not already exists, add key
-    if (r.second) keys_.push_back(key);
-
-    // return new or old estimator
-    return r.first->second;
-  }
-
-  template <class key_t, class estimator_t>
-  estimator_t& Collection<key_t, estimator_t>::operator[](const key_t& key)
-  {
-    auto r = keys_estimators_.insert({key, estimator_t()});
-    if (r.second) keys_.push_back(key);
-    return r.first->second;
-  }
 
 }
 

@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIME_HDF5TYPES_H
-#define LIME_HDF5TYPES_H
+#ifndef LIME_H5_TYPES_H
+#define LIME_H5_TYPES_H
 
 #include <complex>
+#include <cassert>
 
 #include <hdf5.h>
 

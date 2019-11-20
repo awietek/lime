@@ -15,11 +15,8 @@
 #ifndef LIME_TIMESERIES_H
 #define LIME_TIMESERIES_H
 
-#include <algorithm>
-#include <numeric>
-
+#include <vector>
 #include <lime/complex.h>
-#include <lime/acor.h>
 
 namespace lime
 {
@@ -29,11 +26,15 @@ namespace lime
   template <class coeff_t = double>
   class Timeseries
   {
+    using scalar_t = complex::scalar_t<coeff_t>;
+    using real_scalar_t = complex::real_scalar_t<coeff_t>;
+    using complex_scalar_t = complex::complex_scalar_t<coeff_t>;
     using real_t = complex::real_t<coeff_t>;
+    using complex_t = complex::complex_t<coeff_t>;
+
     using vector_t = std::vector<coeff_t>;
     using iterator_t = typename vector_t::iterator;
     using const_iterator_t = typename vector_t::const_iterator;
-
 
   public:
     using data_t = coeff_t;
@@ -43,13 +44,13 @@ namespace lime
     uint64 size() const;
     coeff_t mean() const;
     vector_t autocovariance(uint64 maxtime = 20) const;
-    std::pair<real_t, real_t> error_tau() const;
+    real_t variance() const;
     real_t error() const;
     std::string output() const;
 
-    void operator<<(const coeff_t& x);
-    coeff_t& operator[](const int& idx);
-    const coeff_t& operator[](const int& idx) const;
+    void operator<<(coeff_t const& x);
+    coeff_t& operator[](int const& idx);
+    const coeff_t& operator[](int const& idx) const;
 
     iterator_t begin() { return series_.begin(); }
     iterator_t end() { return series_.end(); }
@@ -65,79 +66,6 @@ namespace lime
     vector_t series_;    
   };
 
-  template <class coeff_t>
-  Timeseries<coeff_t>::Timeseries(const vector_t& series)
-    : series_(series) {}
- 
-  template <class coeff_t>
-  uint64 Timeseries<coeff_t>::size() const
-  { return series_.size(); }
-  
-  template <class coeff_t>
-  coeff_t Timeseries<coeff_t>::mean() const
-  { 
-    return std::accumulate(series_.begin(), series_.end(), 0.0) / 
-      (coeff_t)size(); 
-  }
-
-  template <class coeff_t>
-  std::vector<coeff_t> Timeseries<coeff_t>::autocovariance(uint64 maxtime) const
-  {
-    uint64 L = size();
-    assert(maxtime < L); // Max time for autocorr < length of Timeseries
-
-    // Compute series with mean subtracted
-    coeff_t mn = mean();
-    vector_t series_normalized_ = series_;
-    std::for_each(series_normalized_.begin(), series_normalized_.end(), 
-		  [&mn](coeff_t& x) { x -= mn;});
-    
-    // Compute the autocovariance
-    vector_t autocov(maxtime, 0.0);
-    for (uint64 t = 0; t < maxtime; t++)
-      {
-	for (uint64 n = 0; n < L - t; n++)
-	  autocov[t] += series_normalized_[n] * series_normalized_[n + t];
-	autocov[t] /= (coeff_t)(L - t);
-      }
-    return autocov;
-  }
-
-  template <class coeff_t>
-  std::pair<real_t<coeff_t>, real_t<coeff_t>> Timeseries<coeff_t>::error_tau() const
-  {
-    double mean, sigma, tau;
-    std::vector<double> work(series_.begin(), series_.end());
-    acor::acor(&mean, &sigma, &tau, work.data(), size());
-    return {(real_t) sigma, (real_t) tau};
-  }
-
-  template <class coeff_t>
-  real_t<coeff_t> Timeseries<coeff_t>::error() const
-  {
-    auto err_tau = error_tau();
-    return err_tau.first;
-  }
-
-  template <class coeff_t>
-  std::string Timeseries<coeff_t>::output() const
-  {
-    auto err_tau = error_tau();
-    std::stringstream ss;
-    ss << mean() << " +- " << err_tau.first << ", tau: " << err_tau.second; 
-    return ss.str();
-  }
-  template <class coeff_t>
-  void Timeseries<coeff_t>::operator<<(const coeff_t& x)
-  { series_.push_back(x); }
-
-  template <class coeff_t>
-  coeff_t& Timeseries<coeff_t>::operator[](const int& idx)
-  { return series_[idx]; }
-
-  template <class coeff_t>
-  const coeff_t& Timeseries<coeff_t>::operator[](const int& idx) const
-  { return series_[idx]; }
 }
 
 #endif

@@ -19,75 +19,30 @@
 #include <complex>
 
 #include <lime/timeseries.h>
-#include <lime/detail/h5_io_detail.h>
 
 namespace lime
 {
-
-  template <class coeff_t>
-  inline void writeh5(const Timeseries<coeff_t>& timeseries, 
-		      std::string filename, std::string tag="data");
-
-
-  template <>
-  inline void writeh5<float>(const Timeseries<float>& timeseries, 
-			     std::string filename, std::string tag)
-  { 
-    detail::writeh5_array_1d<float>(timeseries.size(), timeseries.data(), 
-				  filename, tag);
-  }
-
-  template <>
-  inline void writeh5<double>(const Timeseries<double>& timeseries,
-			      std::string filename, std::string tag)
-  { 
-    detail::writeh5_array_1d<double>(timeseries.size(), timeseries.data(), 
-				   filename, tag);
-  }
-  template <>
-  inline void writeh5<std::complex<float>>
-  (const Timeseries<std::complex<float>>& timeseries, std::string filename, 
-   std::string tag)
-  { 
-    detail::writeh5_array_1d<std::complex<float>>(timeseries.size(), 
-						timeseries.data(), 
-						filename, tag);
-  }
-  template <>
-  inline void writeh5<std::complex<double>>
-  (const Timeseries<std::complex<double>>& timeseries, std::string filename, 
-		    std::string tag)
-  { 
-    detail::writeh5_array_1d<std::complex<double>>(timeseries.size(), 
-						 timeseries.data(), 
-						 filename, tag);
-  }
-
-  template <class coeff_t>
-  inline Timeseries<coeff_t> readh5(std::string filename, 
-				    std::string tag="data");
   
-  template <>
-  inline Timeseries<float> readh5(std::string filename, std::string tag)
-  { return Timeseries<float>(detail::readh5_array_1d<float>(filename, tag)); }
-    template <>
-  inline Timeseries<double> readh5(std::string filename, std::string tag)
-  { return Timeseries<double>(detail::readh5_array_1d<double>(filename, tag)); }
-  template <>
-  inline Timeseries<std::complex<float>> readh5
-  (std::string filename, std::string tag)
-  { 
-    return Timeseries<std::complex<float>>
-      (detail::readh5_array_1d<std::complex<float>>(filename, tag)); 
-  }
-  template <>
-  inline Timeseries<std::complex<double>> readh5
-  (std::string filename, std::string tag)
-   { 
-    return Timeseries<std::complex<double>>
-      (detail::readh5_array_1d<std::complex<double>>(filename, tag)); 
-  }
+  void writeh5
+  (Timeseries<float> const& timeseries, 
+   std::string filename, std::string tag);
 
+  void writeh5
+  (Timeseries<double> const& timeseries, 
+   std::string filename, std::string tag);
+
+  void writeh5
+  (Timeseries<std::complex<float>> const& timeseries, 
+   std::string filename, std::string tag);    
+
+  void writeh5
+  (Timeseries<std::complex<double>> const& timeseries, 
+   std::string filename, std::string tag);
+
+  template <class coeff_t>
+  Timeseries<coeff_t> readh5(std::string filename, 
+			     std::string tag="data");
+  
 }
 
 #endif
