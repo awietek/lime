@@ -25,19 +25,19 @@ namespace lime
   
   void writeh5
   (Timeseries<float> const& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   void writeh5
   (Timeseries<double> const& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   void writeh5
   (Timeseries<std::complex<float>> const& timeseries, 
-   std::string filename, std::string tag);    
+   std::string filename, std::string tag="data");    
 
   void writeh5
   (Timeseries<std::complex<double>> const& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   template <class coeff_t>
   Timeseries<coeff_t> readh5(std::string filename, 

@@ -26,36 +26,36 @@ namespace lime
 
   void writeh5
   (const Timeseries<lila::Vector<float>>& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   void writeh5
   (const Timeseries<lila::Vector<double>>& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   void writeh5
   (const Timeseries<lila::Vector<std::complex<float>>>& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   void writeh5
   (const Timeseries<lila::Vector<std::complex<double>>>& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
  
   void writeh5
   (const Timeseries<lila::Matrix<float>>& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   void writeh5
   (const Timeseries<lila::Matrix<double>>& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   void writeh5
   (const Timeseries<lila::Matrix<std::complex<float>>>& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
   void writeh5
   (const Timeseries<lila::Matrix<std::complex<double>>>& timeseries, 
-   std::string filename, std::string tag);
+   std::string filename, std::string tag="data");
 
 }
 

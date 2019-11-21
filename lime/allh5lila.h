@@ -21,7 +21,6 @@
 
 // Caution: order of include matters
 #include <lime/timeseries_io_h5_lila.h>
-#include <lime/detail/h5_dumper_detail_lila.h>
 #include "allh5.h"
 
 #endif

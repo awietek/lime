@@ -49,4 +49,14 @@ namespace lime
   template class DumperH5<Timeseries<std::complex<float>>>;
   template class DumperH5<Timeseries<std::complex<double>>>;
 
+  template class DumperH5<Timeseries<lila::Vector<float>>>;
+  template class DumperH5<Timeseries<lila::Vector<double>>>;
+  template class DumperH5<Timeseries<lila::Vector<std::complex<float>>>>;
+  template class DumperH5<Timeseries<lila::Vector<std::complex<double>>>>;
+
+  template class DumperH5<Timeseries<lila::Matrix<float>>>;
+  template class DumperH5<Timeseries<lila::Matrix<double>>>;
+  template class DumperH5<Timeseries<lila::Matrix<std::complex<float>>>>;
+  template class DumperH5<Timeseries<lila::Matrix<std::complex<double>>>>;
+
 }

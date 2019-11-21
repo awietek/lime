@@ -15,9 +15,14 @@
 #ifndef LIME_ALL_H
 #define LIME_ALL_H
 
+#include <hdf5.h>
 #include "estimator.h"
 #include "timeseries.h"
 #include "collection.h"
 #include "dumper.h"
+#include "dumper_h5.h"
+#include "timeseries_io_h5.h"
+#include "timeseries_io_h5_lila.h"
+#include "measurements_h5.h"
 
 #endif

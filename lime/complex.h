@@ -214,7 +214,7 @@ namespace lime {
     inline double norm (std::complex<double> x) { return std::norm(x); }
 
     template <class coeff_t>
-    lila::Vector<coeff_t> norm(lila::Vector<coeff_t> const& v)
+    inline lila::Vector<coeff_t> norm(lila::Vector<coeff_t> const& v)
     {
       auto w = v;
       lila::Map(w, [](coeff_t& x){ x = std::norm(x); });
@@ -222,7 +222,7 @@ namespace lime {
     }
 
     template <class coeff_t>
-    lila::Matrix<coeff_t> norm(lila::Matrix<coeff_t> const& v)
+    inline lila::Matrix<coeff_t> norm(lila::Matrix<coeff_t> const& v)
     {
       auto w = v;
       lila::Map(w, [](coeff_t& x){ x = std::norm(x); });

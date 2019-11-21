@@ -5,7 +5,7 @@
 #include "h5_io_detail_lila.h"
 
 #include <lime/detail/h5_types.h>
-#include <lime/detail/h5_dumper_detail_lila.h>
+#include <lime/detail/h5_dumper_detail.h>
 
 namespace lime
 {

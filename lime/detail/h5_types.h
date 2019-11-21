@@ -35,16 +35,16 @@ namespace lime
     template <> inline hid_t hdf5_datatype<complex>()
     {
       hid_t memtype = H5Tcreate (H5T_COMPOUND, sizeof (complex));
-      herr_t status = H5Tinsert (memtype, "re", 0, H5T_NATIVE_DOUBLE);
-      status = H5Tinsert(memtype, "im", sizeof(double), H5T_NATIVE_DOUBLE);
+      herr_t status = H5Tinsert (memtype, "r", 0, H5T_NATIVE_DOUBLE);
+      status = H5Tinsert(memtype, "i", sizeof(double), H5T_NATIVE_DOUBLE);
       assert(status != -1);
       return memtype;
     }
     template <> inline hid_t hdf5_datatype<scomplex>()
     {
       hid_t memtype = H5Tcreate (H5T_COMPOUND, sizeof (scomplex));
-      herr_t status = H5Tinsert (memtype, "re", 0, H5T_NATIVE_FLOAT);
-      status = H5Tinsert(memtype, "im", sizeof(float), H5T_NATIVE_FLOAT);
+      herr_t status = H5Tinsert (memtype, "r", 0, H5T_NATIVE_FLOAT);
+      status = H5Tinsert(memtype, "i", sizeof(float), H5T_NATIVE_FLOAT);
       assert(status != -1);
       return memtype;
     }

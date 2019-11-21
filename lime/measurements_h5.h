@@ -17,43 +17,69 @@
 
 #include <string>
 #include <map>
+#include <hdf5.h>
 
 #include <lila/all.h>
+#include <lime/complex.h>
+#include <lime/estimator.h>
+#include <lime/timeseries.h>
 
 namespace lime
 {
-  
-  template <class coeff_t = double>
-  class MeasurementsH5
+
+  enum Type { scalar, cscalar, vector, cvector, matrix, cmatrix };
+
+  struct IndexTypeDim
   {
-    using rtype = real_t<coeff_t>;
-    using ctype = complex_t<coeff_t>;
-    using vec_rtype = real_t<coeff_t>;
-    using vec_ctype = complex_t<coeff_t>;
-    using mat_rtype = real_t<coeff_t>;
-    using mat_ctype = complex_t<coeff_t>;
+    long index;
+    Type type;
+    long m,n;
+  };
+
+  template <class coeff_t> class AddHandler;
+  
+  template <class coeff_t=double>
+  class MeasurementsH5Tpl
+  {
+    using rtype = complex::real_t<coeff_t>;
+    using ctype = complex::complex_t<coeff_t>;
+    using vec_rtype = lila::Vector<complex::real_t<coeff_t>>;
+    using vec_ctype = lila::Vector<complex::complex_t<coeff_t>>;
+    using mat_rtype = lila::Matrix<complex::real_t<coeff_t>>;
+    using mat_ctype = lila::Matrix<complex::complex_t<coeff_t>>;
 
   public:
-    MeasurementsH5() = default;
-    MeasurementsH5(std::string dumpfile);
+    MeasurementsH5Tpl() = delete;
+    MeasurementsH5Tpl(std::string filename);
+    MeasurementsH5Tpl(MeasurementsH5Tpl const&) = delete;
+    MeasurementsH5Tpl& operator=(MeasurementsH5Tpl const&) = delete;
+    MeasurementsH5Tpl(MeasurementsH5Tpl&&) = default;
+    MeasurementsH5Tpl& operator=(MeasurementsH5Tpl&&) = default;
+    ~MeasurementsH5Tpl();
 
-    void operator<<(const rtype& x);
-    void operator<<(const ctype& x);
-    void operator<<(const vec_rtype& x);
-    void operator<<(const vec_ctype& x);
-    void operator<<(const mat_rtype& x);
-    void operator<<(const mat_ctype& x);
+    void add(std::string quantity, rtype const& measurement);
+    void add(std::string quantity, ctype const& measurement);
+    void add(std::string quantity, vec_rtype const& measurement);
+    void add(std::string quantity, vec_ctype const& measurement);
+    void add(std::string quantity, mat_rtype const& measurement);
+    void add(std::string quantity, mat_ctype const& measurement);
 
-  private:
-    struct IndexType
-    {
-      long index;
-      enum type { scalar, cscalar, vector, cvector, matrix, cmatrix };
-    }
+    AddHandler<coeff_t> operator[](std::string quantity)
+    { return AddHandler<coeff_t>(quantity, *this); }
 
-    std::string dumpfile_;
-    std::map<std::string, IndexType> index_type_of_quantity_;
+    void dump();
     
+  private:
+    std::string filename_;
+    std::vector<std::string> quantities_;
+    std::map<std::string, IndexTypeDim> index_type_dim_of_quantity_;
+
+    hid_t file_id_;
+    std::map<std::string, hid_t> dataspace_of_quantity_;
+    std::map<std::string, hid_t> dataset_of_quantity_;
+    std::map<std::string, hid_t> dataset_types_of_quantity_;  
+    std::map<std::string, long> previous_dump_of_quantity_;
+   
     std::vector<Estimator<rtype>> scalar_estimators_;
     std::vector<Estimator<ctype>> cscalar_estimators_;
     std::vector<Estimator<vec_rtype>> vector_estimators_;
@@ -67,8 +93,49 @@ namespace lime
     std::vector<Timeseries<vec_ctype>> cvector_timeseries_;
     std::vector<Timeseries<mat_rtype>> matrix_timeseries_;
     std::vector<Timeseries<mat_ctype>> cmatrix_timeseries_;        
-  }
+  };
 
+  template <class coeff_t>
+  class AddHandler
+  {
+    using rtype = complex::real_t<coeff_t>;
+    using ctype = complex::complex_t<coeff_t>;
+    using vec_rtype = lila::Vector<complex::real_t<coeff_t>>;
+    using vec_ctype = lila::Vector<complex::complex_t<coeff_t>>;
+    using mat_rtype = lila::Matrix<complex::real_t<coeff_t>>;
+    using mat_ctype = lila::Matrix<complex::complex_t<coeff_t>>;
+
+  public:
+    AddHandler() = delete;
+    AddHandler(std::string quantity, MeasurementsH5Tpl<coeff_t>& measurements)
+      : quantity_(quantity), measurements_(measurements)
+    {}
+    AddHandler(AddHandler const&) = delete;
+    AddHandler& operator=(AddHandler const&) = delete;
+    AddHandler(AddHandler&&) = default;
+    AddHandler& operator=(AddHandler&&) = default;
+    ~AddHandler() = default;
+    
+    AddHandler& operator<<(rtype const& measurement)
+    { measurements_.add(quantity_, measurement); return *this; }
+    AddHandler& operator<<(ctype const& measurement)
+    { measurements_.add(quantity_, measurement); return *this; }
+    AddHandler& operator<<(vec_rtype const& measurement)
+    { measurements_.add(quantity_, measurement); return *this; }
+    AddHandler& operator<<(vec_ctype const& measurement)
+    { measurements_.add(quantity_, measurement); return *this; }
+    AddHandler& operator<<(mat_rtype const& measurement)
+    { measurements_.add(quantity_, measurement); return *this; }
+    AddHandler& operator<<(mat_ctype const& measurement)
+    { measurements_.add(quantity_, measurement); return *this; }
+
+  private:
+    const std::string quantity_;
+    MeasurementsH5Tpl<coeff_t>& measurements_;
+  };
+
+  using MeasurementsH5 = MeasurementsH5Tpl<double>;
+  using MeasurementsH5Float = MeasurementsH5Tpl<float>;
 }
 
 #endif

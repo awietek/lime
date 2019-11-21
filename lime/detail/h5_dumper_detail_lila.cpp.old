@@ -84,12 +84,12 @@ namespace lime
     }
 
     template <class coeff_t>
-    void dump_to_hdf5_file(const Timeseries<lila::Vector<coeff_t>>& timeseries, 
-			   hid_t file_id, 
-			   std::map<std::string, hid_t>& dataspace_ids,
-			   std::map<std::string, hid_t>& dataset_ids, 
-			   std::map<std::string, hid_t>& dataset_types, 
-			   std::string tag, int& previous_dump)
+    void dump_to_hdf5_file_vector(const Timeseries<lila::Vector<coeff_t>>& timeseries, 
+				  hid_t file_id, 
+				  std::map<std::string, hid_t>& dataspace_ids,
+				  std::map<std::string, hid_t>& dataset_ids, 
+				  std::map<std::string, hid_t>& dataset_types, 
+				  std::string tag, int& previous_dump)
     {
       if (timeseries.size() == 0) return;
 
@@ -149,12 +149,12 @@ namespace lime
 
 
     template <class coeff_t>
-    void dump_to_hdf5_file(const Timeseries<lila::Matrix<coeff_t>>& timeseries, 
-			   hid_t file_id, 
-			   std::map<std::string, hid_t>& dataspace_ids,
-			   std::map<std::string, hid_t>& dataset_ids, 
-			   std::map<std::string, hid_t>& dataset_types, 
-			   std::string tag, int& previous_dump)
+    void dump_to_hdf5_file_matrix(const Timeseries<lila::Matrix<coeff_t>>& timeseries, 
+				  hid_t file_id, 
+				  std::map<std::string, hid_t>& dataspace_ids,
+				  std::map<std::string, hid_t>& dataset_ids, 
+				  std::map<std::string, hid_t>& dataset_types, 
+				  std::string tag, int& previous_dump)
     {
       if (timeseries.size() == 0) return;
 
@@ -249,28 +249,28 @@ namespace lime
 
 
     template
-    void dump_to_hdf5_file<float>
+    void dump_to_hdf5_file_vector<float>
     (Timeseries<lila::Vector<float>> const& timeseries, hid_t file_id, 
      std::map<std::string, hid_t>& dataspace_ids,
      std::map<std::string, hid_t>& dataset_ids, 
      std::map<std::string, hid_t>& dataset_types, 
      std::string tag, int& previous_dump);
     template
-    void dump_to_hdf5_file<double>
+    void dump_to_hdf5_file_vector<double>
     (Timeseries<lila::Vector<double>> const& timeseries, hid_t file_id, 
      std::map<std::string, hid_t>& dataspace_ids,
      std::map<std::string, hid_t>& dataset_ids, 
      std::map<std::string, hid_t>& dataset_types, 
      std::string tag, int& previous_dump);
     template
-    void dump_to_hdf5_file<std::complex<float>>
+    void dump_to_hdf5_file_vector<std::complex<float>>
     (Timeseries<lila::Vector<std::complex<float>>> const& timeseries, hid_t file_id, 
      std::map<std::string, hid_t>& dataspace_ids,
      std::map<std::string, hid_t>& dataset_ids, 
      std::map<std::string, hid_t>& dataset_types, 
      std::string tag, int& previous_dump);
     template
-    void dump_to_hdf5_file<std::complex<double>>
+    void dump_to_hdf5_file_vector<std::complex<double>>
     (Timeseries<lila::Vector<std::complex<double>>> const& timeseries, hid_t file_id, 
      std::map<std::string, hid_t>& dataspace_ids,
      std::map<std::string, hid_t>& dataset_ids, 
@@ -279,33 +279,129 @@ namespace lime
 
 
     template
-    void dump_to_hdf5_file<float>
+    void dump_to_hdf5_file_matrix<float>
     (Timeseries<lila::Matrix<float>> const& timeseries, hid_t file_id, 
      std::map<std::string, hid_t>& dataspace_ids,
      std::map<std::string, hid_t>& dataset_ids, 
      std::map<std::string, hid_t>& dataset_types, 
      std::string tag, int& previous_dump);
     template
-    void dump_to_hdf5_file<double>
+    void dump_to_hdf5_file_matrix<double>
     (Timeseries<lila::Matrix<double>> const& timeseries, hid_t file_id, 
      std::map<std::string, hid_t>& dataspace_ids,
      std::map<std::string, hid_t>& dataset_ids, 
      std::map<std::string, hid_t>& dataset_types, 
      std::string tag, int& previous_dump);
     template
-    void dump_to_hdf5_file<std::complex<float>>
+    void dump_to_hdf5_file_matrix<std::complex<float>>
     (Timeseries<lila::Matrix<std::complex<float>>> const& timeseries, hid_t file_id, 
      std::map<std::string, hid_t>& dataspace_ids,
      std::map<std::string, hid_t>& dataset_ids, 
      std::map<std::string, hid_t>& dataset_types, 
      std::string tag, int& previous_dump);
     template
-    void dump_to_hdf5_file<std::complex<double>>
+    void dump_to_hdf5_file_matrix<std::complex<double>>
     (Timeseries<lila::Matrix<std::complex<double>>> const& timeseries, hid_t file_id, 
      std::map<std::string, hid_t>& dataspace_ids,
      std::map<std::string, hid_t>& dataset_ids, 
      std::map<std::string, hid_t>& dataset_types, 
      std::string tag, int& previous_dump);
+
+
+    void dump_to_hdf5_file
+    (Timeseries<lila::Vector<float>>& timeseries, hid_t file_id, 
+     std::map<std::string, hid_t>& dataspace_ids,
+     std::map<std::string, hid_t>& dataset_ids, 
+     std::map<std::string, hid_t>& dataset_types, 
+     std::string tag, int& previous_dump)
+    {
+      dump_to_hdf5_file_vector<float>
+	(timeseries, file_id, dataspace_ids, 
+	 dataset_ids, dataset_types, tag, previous_dump);
+    } 
+    void dump_to_hdf5_file
+    (Timeseries<lila::Vector<double>>& timeseries, hid_t file_id, 
+     std::map<std::string, hid_t>& dataspace_ids,
+     std::map<std::string, hid_t>& dataset_ids, 
+     std::map<std::string, hid_t>& dataset_types, 
+     std::string tag, int& previous_dump)
+    {
+      dump_to_hdf5_file_vector<double>
+	(timeseries, file_id, dataspace_ids, 
+	 dataset_ids, dataset_types, tag, previous_dump);
+    } 
+    void dump_to_hdf5_file
+    (Timeseries<lila::Vector<std::complex<float>>>& timeseries, hid_t file_id, 
+     std::map<std::string, hid_t>& dataspace_ids,
+     std::map<std::string, hid_t>& dataset_ids, 
+     std::map<std::string, hid_t>& dataset_types, 
+     std::string tag, int& previous_dump)
+    {
+      dump_to_hdf5_file_vector<std::complex<float>>
+	(timeseries, file_id, dataspace_ids, 
+	 dataset_ids, dataset_types, tag, previous_dump);
+    } 
+    void dump_to_hdf5_file
+    (Timeseries<lila::Vector<std::complex<double>>>& timeseries, hid_t file_id, 
+     std::map<std::string, hid_t>& dataspace_ids,
+     std::map<std::string, hid_t>& dataset_ids, 
+     std::map<std::string, hid_t>& dataset_types, 
+     std::string tag, int& previous_dump)
+    {
+      dump_to_hdf5_file_vector<std::complex<double>>
+	(timeseries, file_id, dataspace_ids, 
+	 dataset_ids, dataset_types, tag, previous_dump);
+    } 
+
+
+
+
+
+    void dump_to_hdf5_file
+    (Timeseries<lila::Matrix<float>>& timeseries, hid_t file_id, 
+     std::map<std::string, hid_t>& dataspace_ids,
+     std::map<std::string, hid_t>& dataset_ids, 
+     std::map<std::string, hid_t>& dataset_types, 
+     std::string tag, int& previous_dump)
+    {
+      dump_to_hdf5_file_matrix<float>
+	(timeseries, file_id, dataspace_ids, 
+	 dataset_ids, dataset_types, tag, previous_dump);
+    } 
+    void dump_to_hdf5_file
+    (Timeseries<lila::Matrix<double>>& timeseries, hid_t file_id, 
+     std::map<std::string, hid_t>& dataspace_ids,
+     std::map<std::string, hid_t>& dataset_ids, 
+     std::map<std::string, hid_t>& dataset_types, 
+     std::string tag, int& previous_dump)
+    {
+      dump_to_hdf5_file_matrix<double>
+	(timeseries, file_id, dataspace_ids, 
+	 dataset_ids, dataset_types, tag, previous_dump);
+    } 
+    void dump_to_hdf5_file
+    (Timeseries<lila::Matrix<std::complex<float>>>& timeseries, hid_t file_id, 
+     std::map<std::string, hid_t>& dataspace_ids,
+     std::map<std::string, hid_t>& dataset_ids, 
+     std::map<std::string, hid_t>& dataset_types, 
+     std::string tag, int& previous_dump)
+    {
+      dump_to_hdf5_file_matrix<std::complex<float>>
+	(timeseries, file_id, dataspace_ids, 
+	 dataset_ids, dataset_types, tag, previous_dump);
+    } 
+    void dump_to_hdf5_file
+    (Timeseries<lila::Matrix<std::complex<double>>>& timeseries, hid_t file_id, 
+     std::map<std::string, hid_t>& dataspace_ids,
+     std::map<std::string, hid_t>& dataset_ids, 
+     std::map<std::string, hid_t>& dataset_types, 
+     std::string tag, int& previous_dump)
+    {
+      dump_to_hdf5_file_matrix<std::complex<double>>
+	(timeseries, file_id, dataspace_ids, 
+	 dataset_ids, dataset_types, tag, previous_dump);
+    } 
+
 
   }  // namespace detail
 

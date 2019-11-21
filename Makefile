@@ -13,8 +13,8 @@ testdepends = $(subst .cpp,.d,$(testsources))
 .PHONY: all 
 all:  $(objects) lib
 
-test:  $(objects) $(testobjects) lib
-	$(cc) $(ccopt) $(ccarch) -o $(tstdir)/tests $(objects) $(testobjects) $(includes) $(libraries) 
+test:  $(objects) $(testobjects) lib 
+	$(cc) $(ccopt) $(ccarch) $(objects) $(testobjects) $(includes) $(libraries) -o test/tests 
 
 $(depends):
 include $(depends)
@@ -23,7 +23,7 @@ $(testdepends):
 include $(testdepends)
 
 lib: $(objects)
-	ar rcs lib/liblime.a $(objects) $(libraries)
+	ar rcs lib/liblime.a $(objects)
 
 .PHONY: clean
 clean:
