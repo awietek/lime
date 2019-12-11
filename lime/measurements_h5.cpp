@@ -13,28 +13,32 @@ namespace lime
   MeasurementsH5Tpl<coeff_t>::MeasurementsH5Tpl(std::string filename)
     : filename_(filename)
   {
-    file_id_ = H5Fcreate(filename_.c_str(), H5F_ACC_TRUNC, 
-			 H5P_DEFAULT, H5P_DEFAULT);
+    if (filename_ != "")
+      file_id_ = H5Fcreate(filename_.c_str(), H5F_ACC_TRUNC, 
+			   H5P_DEFAULT, H5P_DEFAULT);
   }
 
   template <class coeff_t>
   MeasurementsH5Tpl<coeff_t>::~MeasurementsH5Tpl()
   {
-    herr_t status;
-    for (auto id : dataspace_of_quantity_)
+    if (filename_ != "")
       {
-	status = H5Sclose(id.second);
+	herr_t status;
+	for (auto id : dataspace_of_quantity_)
+	  {
+	    status = H5Sclose(id.second);
+	    assert(status > -1);
+	  }
+
+	for (auto id : dataset_of_quantity_)
+	  {
+	    status = H5Dclose(id.second);
+	    assert(status > -1);
+	  }
+
+	status = H5Fclose(file_id_);
 	assert(status > -1);
       }
-
-    for (auto id : dataset_of_quantity_)
-      {
-	status = H5Dclose(id.second);
-	assert(status > -1);
-      }
-
-    status = H5Fclose(file_id_);
-    assert(status > -1);
   }
 
   namespace detail
@@ -112,8 +116,7 @@ namespace lime
 	  quantities.push_back(quantity);
 
 	  // Define index in vector of estimators, its type, and dimension
-	  long index = estimators.size();
-	  assert(timeseries.size() == index);
+	  long index = timeseries.size();
 	  index_type_dim_of_quantity[quantity] = 
 	    IndexTypeDim({index, type, m, n});
 
@@ -155,129 +158,147 @@ namespace lime
   void MeasurementsH5Tpl<coeff_t>::add(std::string quantity, 
 				       rtype const& measurement)
   {
-    // printf("Add real scalar\n");
-    int m = 0;
-    int n = 0;    
-    detail::add_to_measurements
-      (quantity, measurement, m, n, scalar, quantities_, 
-       scalar_estimators_, scalar_timeseries_, 
-       index_type_dim_of_quantity_, 
-       dataspace_of_quantity_, dataset_of_quantity_,
-       dataset_types_of_quantity_,
-       previous_dump_of_quantity_, 
-       detail::h5_create_timeseries_dataspace_scalar,
-       detail::h5_create_timeseries_dataset_scalar<coeff_t>, file_id_);
+    if (filename_ != "")
+      {
+	// printf("Add real scalar\n");
+	int m = 0;
+	int n = 0;    
+	detail::add_to_measurements
+	  (quantity, measurement, m, n, scalar, quantities_, 
+	   scalar_estimators_, scalar_timeseries_, 
+	   index_type_dim_of_quantity_, 
+	   dataspace_of_quantity_, dataset_of_quantity_,
+	   dataset_types_of_quantity_,
+	   previous_dump_of_quantity_, 
+	   detail::h5_create_timeseries_dataspace_scalar,
+	   detail::h5_create_timeseries_dataset_scalar<coeff_t>, file_id_);
+      }
   }
 
   template <class coeff_t>
   void MeasurementsH5Tpl<coeff_t>::add
   (std::string quantity, ctype const& measurement)
   {
-    // printf("Add complex scalar\n");
-    int m = 0;
-    int n = 0;
-    detail::add_to_measurements
-      (quantity, measurement, m, n, cscalar, quantities_, 
-       cscalar_estimators_, cscalar_timeseries_, 
-       index_type_dim_of_quantity_, 
-       dataspace_of_quantity_, dataset_of_quantity_,
-       dataset_types_of_quantity_, 
-       previous_dump_of_quantity_,
-       detail::h5_create_timeseries_dataspace_scalar,
-       detail::h5_create_timeseries_dataset_scalar<complex::complex_t<coeff_t>>,
-       file_id_);
+    if (filename_ != "")
+      {
+	// printf("Add complex scalar\n");
+	int m = 0;
+	int n = 0;
+	detail::add_to_measurements
+	  (quantity, measurement, m, n, cscalar, quantities_, 
+	   cscalar_estimators_, cscalar_timeseries_, 
+	   index_type_dim_of_quantity_, 
+	   dataspace_of_quantity_, dataset_of_quantity_,
+	   dataset_types_of_quantity_, 
+	   previous_dump_of_quantity_,
+	   detail::h5_create_timeseries_dataspace_scalar,
+	   detail::h5_create_timeseries_dataset_scalar<complex::complex_t<coeff_t>>,
+	   file_id_);
+      }
   }
 
   template <class coeff_t>
   void MeasurementsH5Tpl<coeff_t>::add
   (std::string quantity, vec_rtype const& measurement)
   {
-    // printf("Add real vector\n");
-    int m = measurement.size();
-    int n = 0;    
-    detail::add_to_measurements
-      (quantity, measurement, m, n, vector, quantities_, 
-       vector_estimators_, vector_timeseries_, 
-       index_type_dim_of_quantity_, 
-       dataspace_of_quantity_, dataset_of_quantity_,
-       dataset_types_of_quantity_, 
-       previous_dump_of_quantity_,
-       [m](){ return detail::h5_create_timeseries_dataspace_vector(m); },
-       [m](hid_t file_id, hid_t dataspace_id, std::string tag)
-       { 
-	 return detail::h5_create_timeseries_dataset_vector<coeff_t>
-	   (file_id, dataspace_id, tag, m);
-       },
-       file_id_);
+    if (filename_ != "")
+      {
+	// printf("Add real vector\n");
+	int m = measurement.size();
+	int n = 0;    
+	detail::add_to_measurements
+	  (quantity, measurement, m, n, vector, quantities_, 
+	   vector_estimators_, vector_timeseries_, 
+	   index_type_dim_of_quantity_, 
+	   dataspace_of_quantity_, dataset_of_quantity_,
+	   dataset_types_of_quantity_, 
+	   previous_dump_of_quantity_,
+	   [m](){ return detail::h5_create_timeseries_dataspace_vector(m); },
+	   [m](hid_t file_id, hid_t dataspace_id, std::string tag)
+	   { 
+	     return detail::h5_create_timeseries_dataset_vector<coeff_t>
+	       (file_id, dataspace_id, tag, m);
+	   },
+	   file_id_);
+      }
   }
 
   template <class coeff_t>
   void MeasurementsH5Tpl<coeff_t>::add
   (std::string quantity, vec_ctype const& measurement)
   {
-    // printf("Add complex vector\n");
-    int m = measurement.size();
-    int n = 0;    
-    detail::add_to_measurements
-      (quantity, measurement, m, n, cvector, quantities_, 
-       cvector_estimators_, cvector_timeseries_, 
-       index_type_dim_of_quantity_, 
-       dataspace_of_quantity_, dataset_of_quantity_,
-       dataset_types_of_quantity_, 
-       previous_dump_of_quantity_,
-       [m](){ return detail::h5_create_timeseries_dataspace_vector(m); },
-       [m](hid_t file_id, hid_t dataspace_id, std::string tag)
-       { 
-	 return detail::h5_create_timeseries_dataset_vector<complex::complex_t<coeff_t>>
-	   (file_id, dataspace_id, tag, m);
-       },
-       file_id_);
+    if (filename_ != "")
+      {
+	// printf("Add complex vector\n");
+	int m = measurement.size();
+	int n = 0;    
+	detail::add_to_measurements
+	  (quantity, measurement, m, n, cvector, quantities_, 
+	   cvector_estimators_, cvector_timeseries_, 
+	   index_type_dim_of_quantity_, 
+	   dataspace_of_quantity_, dataset_of_quantity_,
+	   dataset_types_of_quantity_, 
+	   previous_dump_of_quantity_,
+	   [m](){ return detail::h5_create_timeseries_dataspace_vector(m); },
+	   [m](hid_t file_id, hid_t dataspace_id, std::string tag)
+	   { 
+	     return detail::h5_create_timeseries_dataset_vector<complex::complex_t<coeff_t>>
+	       (file_id, dataspace_id, tag, m);
+	   },
+	   file_id_);
+      }
   }
 
   template <class coeff_t>
   void MeasurementsH5Tpl<coeff_t>::add
   (std::string quantity, mat_rtype const& measurement)
   {
-    // printf("Add real matrix\n");
-    int m = measurement.nrows();
-    int n = measurement.ncols();
-    detail::add_to_measurements
-      (quantity, measurement, m, n, matrix, quantities_, 
-       matrix_estimators_, matrix_timeseries_, 
-       index_type_dim_of_quantity_, 
-       dataspace_of_quantity_, dataset_of_quantity_,
-       dataset_types_of_quantity_, 
-       previous_dump_of_quantity_,
-       [m,n](){ return detail::h5_create_timeseries_dataspace_matrix(m, n); },
-       [m,n](hid_t file_id, hid_t dataspace_id, std::string tag)
-       { 
-	 return detail::h5_create_timeseries_dataset_matrix<coeff_t>
-	   (file_id, dataspace_id, tag, m, n);
-       },
-       file_id_);
+    if (filename_ != "")
+      {
+	// printf("Add real matrix\n");
+	int m = measurement.nrows();
+	int n = measurement.ncols();
+	detail::add_to_measurements
+	  (quantity, measurement, m, n, matrix, quantities_, 
+	   matrix_estimators_, matrix_timeseries_, 
+	   index_type_dim_of_quantity_, 
+	   dataspace_of_quantity_, dataset_of_quantity_,
+	   dataset_types_of_quantity_, 
+	   previous_dump_of_quantity_,
+	   [m,n](){ return detail::h5_create_timeseries_dataspace_matrix(m, n); },
+	   [m,n](hid_t file_id, hid_t dataspace_id, std::string tag)
+	   { 
+	     return detail::h5_create_timeseries_dataset_matrix<coeff_t>
+	       (file_id, dataspace_id, tag, m, n);
+	   },
+	   file_id_);
+      }
   }
 
   template <class coeff_t>
   void MeasurementsH5Tpl<coeff_t>::add
   (std::string quantity, mat_ctype const& measurement)
   {
-    // printf("Add complex matrix\n");
-    int m = measurement.nrows();
-    int n = measurement.ncols();
-    detail::add_to_measurements
-      (quantity, measurement, m, n, cmatrix, quantities_, 
-       cmatrix_estimators_, cmatrix_timeseries_, 
-       index_type_dim_of_quantity_, 
-       dataspace_of_quantity_, dataset_of_quantity_,
-       dataset_types_of_quantity_, 
-       previous_dump_of_quantity_,
-       [m,n](){ return detail::h5_create_timeseries_dataspace_matrix(m,n); },
-       [m,n](hid_t file_id, hid_t dataspace_id, std::string tag)
-       { 
-	 return detail::h5_create_timeseries_dataset_matrix<complex::complex_t<coeff_t>>
-	   (file_id, dataspace_id, tag, m, n);
-       },
-       file_id_);
+    if (filename_ != "")
+      {
+	// printf("Add complex matrix\n");
+	int m = measurement.nrows();
+	int n = measurement.ncols();
+	detail::add_to_measurements
+	  (quantity, measurement, m, n, cmatrix, quantities_, 
+	   cmatrix_estimators_, cmatrix_timeseries_, 
+	   index_type_dim_of_quantity_, 
+	   dataspace_of_quantity_, dataset_of_quantity_,
+	   dataset_types_of_quantity_, 
+	   previous_dump_of_quantity_,
+	   [m,n](){ return detail::h5_create_timeseries_dataspace_matrix(m,n); },
+	   [m,n](hid_t file_id, hid_t dataspace_id, std::string tag)
+	   { 
+	     return detail::h5_create_timeseries_dataset_matrix<complex::complex_t<coeff_t>>
+	       (file_id, dataspace_id, tag, m, n);
+	   },
+	   file_id_);
+      }
   }
 
 
@@ -285,61 +306,64 @@ namespace lime
   template <class coeff_t>
   void MeasurementsH5Tpl<coeff_t>::dump()
   {
-    for (auto quantity : quantities_)
+    if (filename_ != "")
       {
-	auto index_type_dim = index_type_dim_of_quantity_[quantity];
-	long index = index_type_dim.index;
-	Type type = index_type_dim.type;
-	int previous_dump = previous_dump_of_quantity_[quantity];
+	for (auto quantity : quantities_)
+	  {
+	    auto index_type_dim = index_type_dim_of_quantity_[quantity];
+	    long index = index_type_dim.index;
+	    Type type = index_type_dim.type;
+	    int previous_dump = previous_dump_of_quantity_[quantity];
 
-	switch (type)
-	{
-	case(scalar):
-	  detail::dump_to_hdf5_file
-	    (scalar_timeseries_[index], file_id_, dataspace_of_quantity_,
-	     dataset_of_quantity_, dataset_types_of_quantity_, quantity,
-	     previous_dump);	    
-	  break;
+	    switch (type)
+	      {
+	      case(scalar):
+		detail::dump_to_hdf5_file
+		  (scalar_timeseries_[index], file_id_, dataspace_of_quantity_,
+		   dataset_of_quantity_, dataset_types_of_quantity_, quantity,
+		   previous_dump);	    
+		break;
 
-	case(cscalar):
-	  detail::dump_to_hdf5_file
-	    (cscalar_timeseries_[index], file_id_, dataspace_of_quantity_,
-	     dataset_of_quantity_, dataset_types_of_quantity_, quantity,
-	     previous_dump);
-	  break;
+	      case(cscalar):
+		detail::dump_to_hdf5_file
+		  (cscalar_timeseries_[index], file_id_, dataspace_of_quantity_,
+		   dataset_of_quantity_, dataset_types_of_quantity_, quantity,
+		   previous_dump);
+		break;
 
-	case(vector):
-	  detail::dump_to_hdf5_file
-	    (vector_timeseries_[index], file_id_, dataspace_of_quantity_,
-	     dataset_of_quantity_, dataset_types_of_quantity_, quantity,
-	     previous_dump);	  
-	  break;
+	      case(vector):
+		detail::dump_to_hdf5_file
+		  (vector_timeseries_[index], file_id_, dataspace_of_quantity_,
+		   dataset_of_quantity_, dataset_types_of_quantity_, quantity,
+		   previous_dump);	  
+		break;
 
-	case(cvector):
-	  detail::dump_to_hdf5_file
-	    (cvector_timeseries_[index], file_id_, dataspace_of_quantity_,
-	     dataset_of_quantity_, dataset_types_of_quantity_, quantity,
-	     previous_dump);
-	  break;	
+	      case(cvector):
+		detail::dump_to_hdf5_file
+		  (cvector_timeseries_[index], file_id_, dataspace_of_quantity_,
+		   dataset_of_quantity_, dataset_types_of_quantity_, quantity,
+		   previous_dump);
+		break;	
 
-	case(matrix):
-	  detail::dump_to_hdf5_file
-	    (matrix_timeseries_[index], file_id_, dataspace_of_quantity_,
-	     dataset_of_quantity_, dataset_types_of_quantity_, quantity,
-	     previous_dump);
-	  break;
+	      case(matrix):
+		detail::dump_to_hdf5_file
+		  (matrix_timeseries_[index], file_id_, dataspace_of_quantity_,
+		   dataset_of_quantity_, dataset_types_of_quantity_, quantity,
+		   previous_dump);
+		break;
 
-	case(cmatrix):
-	  detail::dump_to_hdf5_file
-	    (cmatrix_timeseries_[index], file_id_, dataspace_of_quantity_,
-	     dataset_of_quantity_, dataset_types_of_quantity_, quantity,
-	     previous_dump);
-	  break;
-	}
+	      case(cmatrix):
+		detail::dump_to_hdf5_file
+		  (cmatrix_timeseries_[index], file_id_, dataspace_of_quantity_,
+		   dataset_of_quantity_, dataset_types_of_quantity_, quantity,
+		   previous_dump);
+		break;
+	      }
 
-	// Update previous_dump
-	previous_dump_of_quantity_[quantity] = previous_dump;
+	    // Update previous_dump
+	    previous_dump_of_quantity_[quantity] = previous_dump;
 
+	  }
       }
 
   }

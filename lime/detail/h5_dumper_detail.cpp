@@ -96,6 +96,9 @@ namespace lime
       H5Sclose(dataspace_ids[tag]);
       dataspace_ids[tag] = filespace;
       previous_dump = timeseries.size();
+
+      H5Fflush(file_id, H5F_SCOPE_GLOBAL);
+
     }
 
 
@@ -323,6 +326,7 @@ namespace lime
 	  dataspace_ids[tag] = H5Dget_space(dataset_ids[tag]);
 	}
       previous_dump = timeseries.size();
+      H5Fflush(file_id, H5F_SCOPE_GLOBAL);
     }
 
 
@@ -396,6 +400,7 @@ namespace lime
 	  dataspace_ids[tag] = H5Dget_space(dataset_ids[tag]);
 	}
       previous_dump = timeseries.size();
+      H5Fflush(file_id, H5F_SCOPE_GLOBAL);
     }
 
 
