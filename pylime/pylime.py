@@ -5,10 +5,158 @@ PyLime Python module for lightweight Monte Carlo estimation
 :author: Alexander Wietek
 """
 from __future__ import absolute_import, division, print_function
+import os
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 from functools import wraps
+import re
+from collections import OrderedDict, defaultdict
+import h5py
+import copy
+
+
+def read_data(directory, regex, quantities, verbose=True):
+    """ Read data for various seeds and quantities using regular expression
+    
+    Args:
+        directory (str)  : directory containing all data files
+        regex (str)      : regular expression to match files in the directory
+        quantities (list): list of strings of quantities in the data files
+        verbose (bool)   : print the matching files
+    Returns:
+        OrderedDict:    dictionary of quantities and seeds
+    """
+    # get files matching the regular expression
+    files = os.listdir(directory)
+    files.sort()
+    file_of_seed = OrderedDict()
+    for fl in files:
+        match = re.search(regex, fl)
+        if match:
+            seed = match.group(1)
+            file_of_seed[seed] = fl
+            if verbose:
+                print("Matched", fl)
+
+    # Read all hdf5 files
+    values_of_quantity_seed = defaultdict(dict)
+    for seed, fl in file_of_seed.items():
+        try:
+            hf = h5py.File(os.path.join(directory, fl), 'r')
+        except:
+            print("Ignoring seed {}".format(seed))
+            continue
+
+        for quantity in quantities:
+            if quantity not in hf.keys():
+                raise ValueError("Couldn't find \"{}\" in seed {}".format(quantity, seed))
+            values_of_quantity_seed[quantity][seed] = hf[quantity][:] 
+   
+    return values_of_quantity_seed
+
+def mean_err_of_data(data, quantities=None, nmin=0, nmax=None):
+    """ simple mean and error of data
+    
+    Args:
+        data:       dictionary of dictionary, quantities and seeds
+    Returns:
+        2x dict:    dictionary of means and errors  of quantities
+    """
+    means = dict()
+    errs = dict()
+    for quantity, values_of_seed in data.items():
+
+        if quantities is None or quantity in quantities:
+            mean_of_seeds = []
+            err_of_seeds = []
+
+            # Compute mean, error for every seed
+            for idx, (seed, values) in enumerate(values_of_seed.items()):
+                vals = copy.deepcopy(values)[nmin:nmax]
+                if vals.shape[0] == 0:
+                    print("Empty seed {}".format(seed))
+                    continue
+                elif vals.shape[0] == 1:
+                    # print("Only one entry in seed {}".format(seed))
+                    e = 0.
+                else:
+                    e = sem(vals)
+
+                m = mean(vals)
+                # print("m:", m, "+-", e, quantity)
+
+                mean_of_seeds.append(m)
+                err_of_seeds.append(e)
+
+            mean_of_seeds = np.array(mean_of_seeds)
+            err_of_seeds = np.array(err_of_seeds)
+
+            # Compute mean, err for all seeds combined
+            mean_total = mean(mean_of_seeds)
+            err_total = sem(mean_of_seeds) #add_sem(err_of_seeds) / len(mean_of_seeds)
+            # print("mt:", mean_total, "+-", err_total)
+
+            # print("total: {} +- {}".format(mean_total, err_total))
+            # for mean, err in zip(mean_of_seeds, err_of_seeds):
+            #     print("seed : {} +- {}".format(mean, err))
+
+            means[quantity] = mean_total
+            errs[quantity] = err_total
+
+    return means, errs
+
+
+def transform_quantity(data, source, target, function):
+    """ transform a quantity in data according to a function
+    
+    Args:
+        data:       dictionary of dictionary, quantities and seeds
+        source:     name of the source quantity
+        target:     name of the target quantity
+        function:   function to apply to every seed
+    Returns:
+        dict of dict:  dictionary of seeds including the transformed 
+    """
+    for (seed, values) in data[source].items():
+        data[target][seed] = function(values)
+    return data
+
+
+def add_quantities(data, sources, target, prefactors=None):
+    """ transform a quantity in data according to a function
+    
+    Args:
+        data:       dictionary of dictionary, quantities and seeds
+        sources:    list of names of the source quantities
+        target:     name of the target quantity
+        prefactors: function to apply to every seed
+    Returns:
+        dict of dict:  dictionary of seeds including the transformed 
+    """
+    
+    first_source = True
+    for source in sources:
+
+        if source not in data.keys():
+            raise ValueError("Quantity {} not found in data!".format(source))
+            
+        if prefactors is None:
+            pre = 1.0
+        else:
+            if source not in prefactors.keys():
+                raise ValueError("Quantity {} not found in prefactors!".format(source))
+            pre = prefactors[source]
+
+        for (seed, values) in data[source].items():
+            if first_source:
+                data[target][seed] = pre * copy.deepcopy(values)
+            else:
+                data[target][seed] += pre * values
+
+        first_source = False
+    return data
+
 
 
 def resample_bin(array, binsize=1, axis=0):
