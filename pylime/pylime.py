@@ -250,7 +250,7 @@ def sem_jackknife(array, axis=0, ddof=0):
         float: sem jackknife
     """
     n = array.shape[axis]
-    return np.sqrt(n-1) * stats.sem(array, axis=axis, ddof=ddof)
+    return np.sqrt((n-1)*(n-ddof)) * stats.sem(array, axis=axis, ddof=ddof)
 
 def err(array, axis=0, ddof=0, binidx=-1):
     """ Compute standard error of a given sample """
@@ -293,7 +293,7 @@ def plot_binning(array, maxk_offset=3, **kwargs):
     plt.semilogx(binsizes, errors)
     plt.show()
 
-def autocorr(data, normalize=True):
+def autocorr(data, min_time=0, normalize=True):
     """ Compute autocorrelation function for a given timeseries
     
     Args:
@@ -305,12 +305,13 @@ def autocorr(data, normalize=True):
     if not isinstance(data, np.ndarray):
         raise ValueError("data not of type numpy.array")
 
-    mean = np.mean(data)
-    data_normalized = data - mean
+    mean = np.mean(data[min_time:])
+    data_normalized = data[min_time:] - mean
     corr = np.correlate(data_normalized, data_normalized,  mode='full')
     autocorr = corr[corr.size // 2:]
     if normalize:
         autocorr /= autocorr[0]
+
     return autocorr
 
 
@@ -339,7 +340,7 @@ def _axes_decorator(plot_func):
 
 
 @_axes_decorator
-def plot_autocorr(timeseries, max_time=20, plot_mean=False, ax=None, 
+def plot_autocorr(timeseries, min_time=0, max_time=20, plot_mean=False, ax=None, 
                   **kwargs):
     """ Plot autocorrelation functions for a list of timeseries
     
@@ -361,11 +362,13 @@ def plot_autocorr(timeseries, max_time=20, plot_mean=False, ax=None,
     # Compute autocorrelation for time window
     n_timeseries = len(timeseries)
     autocorrs_arr = np.zeros((n_timeseries, max_time))
-    for idx, data in enumerate(timeseries): 
-        if len(data) < max_time:
-            raise ValueError("max_time ({}) too long for timeseries length ({})".format(
-                max_time, len(data)))
-        autocorrs_arr[idx, :] = autocorr(data)[:max_time]
+    for idx, (seed, data) in enumerate(timeseries.items()):
+        # if len(data) < max_time:
+        #     raise ValueError("max_time ({}) too long for timeseries length ({})".format(
+        #         max_time, len(data)))
+        if max_time > 0:
+            auto = autocorr(data, min_time=min_time)[:max_time]
+            autocorrs_arr[idx, :len(auto)] = auto
 
     # Plot autocorrelations for timeseries
     for idx in range(n_timeseries):
@@ -397,8 +400,8 @@ def plot_timeseries(timeseries, ax=None, **kwargs):
     """
     if isinstance(timeseries, np.ndarray):
         timeseries = [timeseries]
-
-    for idx, data in enumerate(timeseries): 
+    
+    for idx, data in timeseries.items(): 
         ax.plot(range(len(data)), data, label="{}".format(idx))
 
     ax.set_xlabel("time")
@@ -412,19 +415,19 @@ def auto_window(taus, c):
         return np.argmin(m)
     return len(taus) - 1
 
-def autocorr_time(timeseries, max_time=None, c=5.0):
+def autocorr_time(timeseries, min_time=0, max_time=None, c=5.0):
     """ Compute estimate for the autocorrelation time    
     Args:
         list of arrays (np.array): The timeseries whose autocorrelation function
                                    to plot
     Returns:
-        autocorrelation time accordin to dfm.io/posts/autocorr
+        autocorrelation time according to dfm.io/posts/autocorr
     """
     
     if isinstance(timeseries, np.ndarray):
         timeseries = [timeseries]
-           
-    minl = min([len(data) for data in timeseries])
+
+    minl = min([len(data[min_time:]) for seed, data in timeseries.items()])
     if max_time==None:
         max_time = minl
     else:
@@ -432,11 +435,17 @@ def autocorr_time(timeseries, max_time=None, c=5.0):
             raise ValueError("max_time is too large for data")
 
     f = np.zeros(max_time)
-    for data in timeseries:
-        f += autocorr(data)[:max_time]
-    f /= len(timeseries)
-    taus = 2.0*np.cumsum(f) - 1.0
-    window = auto_window(taus, c)
-    return taus[window]
-        
+    n=0
+    for seed, data in timeseries.items():
+        if max_time > 0:
+            f += autocorr(data, min_time=min_time)[:max_time]
+            n += 1
+    f /= n
+
+    if max_time > 0:
+        taus = 2.0*np.cumsum(f) - 1.0
+        window = auto_window(taus, c)
+        return taus[window]
+    else:
+        return 0
 
