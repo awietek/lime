@@ -45,7 +45,7 @@ def read_data(directory, regex, quantities, verbose=True):
         try:
             hf = h5py.File(os.path.join(directory, fl), 'r')
         except:
-            print("Ignoring seed {}".format(seed))
+            print("Error reading h5file: Ignoring seed {}".format(seed))
             continue
 
         for quantity in quantities:
@@ -55,54 +55,65 @@ def read_data(directory, regex, quantities, verbose=True):
    
     return values_of_quantity_seed
 
-def mean_err_of_data(data, quantities=None, nmin=0, nmax=None):
+def mean_err_of_data(data, quantities=None, nmins=None, nmaxs=None):
     """ simple mean and error of data
     
     Args:
         data:       dictionary of dictionary, quantities and seeds
+        quantities: list of quantities for which to compute mean and error
+                    (default: all means and errors are computed)
+        nmins:      dictionary containing minimum index for each seed
+        nmaxs:      dictionary containing minimum index for each seed
     Returns:
         2x dict:    dictionary of means and errors  of quantities
     """
     means = dict()
     errs = dict()
-    for quantity, values_of_seed in data.items():
 
-        if quantities is None or quantity in quantities:
-            mean_of_seeds = []
-            err_of_seeds = []
+    if quantities == None:
+        quantities = data.keys()
+    
+    for quantity in quantities:
+        mean_of_seeds = []
+        err_of_seeds = []
 
-            # Compute mean, error for every seed
-            for idx, (seed, values) in enumerate(values_of_seed.items()):
-                vals = copy.deepcopy(values)[nmin:nmax]
-                if vals.shape[0] == 0:
-                    print("Empty seed {}".format(seed))
-                    continue
-                elif vals.shape[0] == 1:
-                    # print("Only one entry in seed {}".format(seed))
-                    e = 0.
-                else:
-                    e = sem(vals)
+        # Compute mean, error for every seed
+        for seed, values in data[quantity].items():
 
-                m = mean(vals)
-                # print("m:", m, "+-", e, quantity)
+            # truncate the timeseries
+            if nmins == None:
+                nmin = 0
+            else:
+                nmin = nmins[seed]
+            if nmaxs == None:
+                nmax = None
+            else:
+                nmax = nmaxs[seed]
+            vals = copy.deepcopy(values)[nmin:nmax]
 
-                mean_of_seeds.append(m)
-                err_of_seeds.append(e)
+            if vals.shape[0] == 0:
+                print("Warning: empty seed {}".format(seed))
+                continue
+            elif vals.shape[0] == 1:
+                print("Warning: single entry in seed {}".format(seed))
+                continue
+            else:
+                e = sem(vals)
 
-            mean_of_seeds = np.array(mean_of_seeds)
-            err_of_seeds = np.array(err_of_seeds)
+            m = mean(vals)
 
-            # Compute mean, err for all seeds combined
-            mean_total = mean(mean_of_seeds)
-            err_total = sem(mean_of_seeds) #add_sem(err_of_seeds) / len(mean_of_seeds)
-            # print("mt:", mean_total, "+-", err_total)
+            mean_of_seeds.append(m)
+            err_of_seeds.append(e)
 
-            # print("total: {} +- {}".format(mean_total, err_total))
-            # for mean, err in zip(mean_of_seeds, err_of_seeds):
-            #     print("seed : {} +- {}".format(mean, err))
+        mean_of_seeds = np.array(mean_of_seeds)
+        err_of_seeds = np.array(err_of_seeds)
 
-            means[quantity] = mean_total
-            errs[quantity] = err_total
+        # Compute mean, err for all seeds combined
+        mean_total = mean(mean_of_seeds)
+        err_total = add_sem(err_of_seeds)
+        
+        means[quantity] = mean_total
+        errs[quantity] = err_total
 
     return means, errs
 
@@ -130,10 +141,13 @@ def add_quantities(data, sources, target, prefactors=None):
         data:       dictionary of dictionary, quantities and seeds
         sources:    list of names of the source quantities
         target:     name of the target quantity
-        prefactors: function to apply to every seed
+        prefactors: dictionary of prefactors multiplied to sources
     Returns:
         dict of dict:  dictionary of seeds including the transformed 
     """
+    if target not in data.keys():
+        data[target] = dict()
+    
     
     first_source = True
     for source in sources:
@@ -157,7 +171,22 @@ def add_quantities(data, sources, target, prefactors=None):
         first_source = False
     return data
 
-
+def resample_bin_data(data, quantities=None, binsize=1, axis=0):
+    """ simple mean and error of data
+    
+    Args:
+        data:       dictionary of dictionary, quantities and seeds
+    Returns:
+        2x dict:    dictionary of means and errors  of quantities
+    """
+    data_resampled = dict()
+    for quantity, values_of_seed in data.items():
+        if quantities is None or quantity in quantities:
+            data_resampled[quantity] = dict()
+            for idx, (seed, values) in enumerate(values_of_seed.items()):
+                data_resampled[quantity][seed] = \
+                    resample_bin(data[quantity][seed], binsize, axis)
+    return data_resampled
 
 def resample_bin(array, binsize=1, axis=0):
     """ Resample a given array into bins 
@@ -171,9 +200,30 @@ def resample_bin(array, binsize=1, axis=0):
     """
     if not isinstance(array, np.ndarray):
         raise ValueError("array not of type numpy.array")
-    if binsize > len(array):
+
+    shape = array.shape
+    if not axis < len(shape):
+        raise ValueError("Cannot bin resample axis {}".format(axis))
+
+    if binsize > shape[axis]:
         raise ValueError("binsize larger than length of array")
-    return array[:(array.size // binsize) * binsize].reshape(-1, binsize).mean(axis=1)
+
+    commensurate_size = (shape[axis] // binsize) * binsize
+    resize_shape = []
+    inter_shape = []
+    for idx, d in enumerate(shape):
+        if idx == axis:
+            inter_shape.append(commensurate_size // binsize)
+            inter_shape.append(binsize)
+            resize_shape.append(commensurate_size)
+        else:
+            inter_shape.append(d)
+            resize_shape.append(d)
+
+    array.resize(resize_shape)
+    array_reshaped = array.reshape(inter_shape)
+    
+    return array_reshaped.mean(axis=axis+1)
 
 def resample_jackknife(array, axis=0):
     """ Resample a given array to jackknife samples 
@@ -192,6 +242,26 @@ def resample_jackknife(array, axis=0):
     for seed in range(n_seeds):
         A_resampled[seed] = np.mean(np.delete(array, seed, axis=axis), axis=axis)
     return A_resampled
+
+
+
+def resample_jackknife_data(data, quantities=None, axis=0):
+    """ simple mean and error of data
+    
+    Args:
+        data:       dictionary of dictionary, quantities and seeds
+    Returns:
+        2x dict:    dictionary of means and errors  of quantities
+    """
+    data_resampled = dict()
+    for quantity, values_of_seed in data.items():
+        if quantities is None or quantity in quantities:
+            data_resampled[quantity] = dict()
+            for idx, (seed, values) in enumerate(values_of_seed.items()):
+                data_resampled[quantity][seed] = \
+                    resample_jackknife(data[quantity][seed], axis)
+    return data_resampled
+
 
 def mean(array, axis=0):
     """ Compute the mean of an array
@@ -229,8 +299,8 @@ def sem(array, axis=0, ddof=0):
 def add_sem(e1, e2):
     return np.sqrt(e1**2 + e2**2)
 
-def add_sem(arr):
-    return np.sqrt(np.sum(arr**2)) / len(arr)
+def add_sem(arr, axis=0):
+    return np.sqrt(np.sum(arr**2, axis=axis) / arr.shape[axis])
 
 def mult_sem(m1, e1, m2, e2):
     m = m1 * m2
@@ -293,7 +363,7 @@ def plot_binning(array, maxk_offset=3, **kwargs):
     plt.semilogx(binsizes, errors)
     plt.show()
 
-def autocorr(data, min_time=0, normalize=True):
+def autocorr(data, nmin=0, nmax=None, normalize=True):
     """ Compute autocorrelation function for a given timeseries
     
     Args:
@@ -305,8 +375,8 @@ def autocorr(data, min_time=0, normalize=True):
     if not isinstance(data, np.ndarray):
         raise ValueError("data not of type numpy.array")
 
-    mean = np.mean(data[min_time:])
-    data_normalized = data[min_time:] - mean
+    mean = np.mean(data[nmin:nmax])
+    data_normalized = data[nmin:nmax] - mean
     corr = np.correlate(data_normalized, data_normalized,  mode='full')
     autocorr = corr[corr.size // 2:]
     if normalize:
@@ -340,8 +410,8 @@ def _axes_decorator(plot_func):
 
 
 @_axes_decorator
-def plot_autocorr(timeseries, min_time=0, max_time=20, plot_mean=False, ax=None, 
-                  **kwargs):
+def plot_autocorr(timeseries, nmins=None, nmaxs=None,
+                  max_time=20, plot_mean=False, ax=None, **kwargs):
     """ Plot autocorrelation functions for a list of timeseries
     
     Args:
@@ -359,18 +429,19 @@ def plot_autocorr(timeseries, min_time=0, max_time=20, plot_mean=False, ax=None,
     if isinstance(timeseries, np.ndarray):
         timeseries = [timeseries]
 
+
+        
     # Compute autocorrelation for time window
     n_timeseries = len(timeseries)
     autocorrs_arr = np.zeros((n_timeseries, max_time))
     for idx, (seed, data) in enumerate(timeseries.items()):
-        # if len(data) < max_time:
-        #     raise ValueError("max_time ({}) too long for timeseries length ({})".format(
-        #         max_time, len(data)))
+        max_time_seed = min(max_time, len(data))
         if max_time > 0:
-            auto = autocorr(data, min_time=min_time)[:max_time]
+            auto = autocorr(data, nmins[seed])[:max_time_seed]
             autocorrs_arr[idx, :len(auto)] = auto
 
     # Plot autocorrelations for timeseries
+    autocorrs_arr = np.abs(autocorrs_arr)
     for idx in range(n_timeseries):
         ax.plot(range(max_time), autocorrs_arr[idx, :], label="{}".format(idx))
 
@@ -388,7 +459,7 @@ def plot_autocorr(timeseries, min_time=0, max_time=20, plot_mean=False, ax=None,
 
 
 @_axes_decorator
-def plot_timeseries(timeseries, ax=None, **kwargs):
+def plot_timeseries(timeseries, nmins=None, ax=None, **kwargs):
     """ Plot autocorrelation functions for a list of timeseries
     
     Args:
@@ -401,8 +472,14 @@ def plot_timeseries(timeseries, ax=None, **kwargs):
     if isinstance(timeseries, np.ndarray):
         timeseries = [timeseries]
     
-    for idx, data in timeseries.items(): 
-        ax.plot(range(len(data)), data, label="{}".format(idx))
+    for seed, data in timeseries.items(): 
+        if nmins != None:
+            p = ax.plot(range(len(data)), data, label="{} (from {})".format(
+                                                       seed, nmins[seed]))
+            color = p[-1].get_color()
+            ax.axvline(x=nmins[seed], color=color)
+        else:
+            ax.plot(range(len(data)), data, label="{}".format(seed))
 
     ax.set_xlabel("time")
     ax.set_ylabel("data")
@@ -415,7 +492,7 @@ def auto_window(taus, c):
         return np.argmin(m)
     return len(taus) - 1
 
-def autocorr_time(timeseries, min_time=0, max_time=None, c=5.0):
+def autocorr_time(timeseries, nmins=None, nmaxs=None, max_time=20, c=5.0):
     """ Compute estimate for the autocorrelation time    
     Args:
         list of arrays (np.array): The timeseries whose autocorrelation function
@@ -427,18 +504,23 @@ def autocorr_time(timeseries, min_time=0, max_time=None, c=5.0):
     if isinstance(timeseries, np.ndarray):
         timeseries = [timeseries]
 
-    minl = min([len(data[min_time:]) for seed, data in timeseries.items()])
-    if max_time==None:
-        max_time = minl
-    else:
-        if minl < max_time:
-            raise ValueError("max_time is too large for data")
-
     f = np.zeros(max_time)
     n=0
     for seed, data in timeseries.items():
+        if nmins == None:
+            nmin = 0
+        else:
+            nmin = nmins[seed]
+        if nmaxs == None:
+            nmax = None
+        else:
+            nmax = nmaxs[seed]
+        
         if max_time > 0:
-            f += autocorr(data, min_time=min_time)[:max_time]
+            corr = autocorr(data, nmin=nmin, nmax=nmax)[:max_time]
+            corr_pad_zeros = np.zeros_like(f)
+            corr_pad_zeros[:len(corr)] = corr
+            f += corr_pad_zeros
             n += 1
     f /= n
 
