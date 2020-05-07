@@ -96,22 +96,25 @@ def mean_err_of_data(data, quantities=None, nmins=None, nmaxs=None):
                 continue
             elif vals.shape[0] == 1:
                 print("Warning: single entry in seed {}".format(seed))
-                continue
+                m = mean(vals)
+                mean_of_seeds.append(m)
             else:
                 e = sem(vals)
-
-            m = mean(vals)
-
-            mean_of_seeds.append(m)
-            err_of_seeds.append(e)
+                m = mean(vals)
+                mean_of_seeds.append(m)
+                err_of_seeds.append(e)
 
         mean_of_seeds = np.array(mean_of_seeds)
         err_of_seeds = np.array(err_of_seeds)
 
         # Compute mean, err for all seeds combined
         mean_total = mean(mean_of_seeds)
-        err_total = add_sem(err_of_seeds)
-        
+        if len(err_of_seeds) > 0:
+            err_total = stats.sem(mean_of_seeds) +\
+                add_sem(err_of_seeds) / len(err_of_seeds)
+        else:
+            err_total = stats.sem(mean_of_seeds)
+
         means[quantity] = mean_total
         errs[quantity] = err_total
 
@@ -300,7 +303,7 @@ def add_sem(e1, e2):
     return np.sqrt(e1**2 + e2**2)
 
 def add_sem(arr, axis=0):
-    return np.sqrt(np.sum(arr**2, axis=axis) / arr.shape[axis])
+    return np.sqrt(np.sum(arr**2, axis=axis))
 
 def mult_sem(m1, e1, m2, e2):
     m = m1 * m2
