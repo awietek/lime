@@ -110,7 +110,7 @@ def mean_err_of_data(data, quantities=None, nmins=None, nmaxs=None):
         # Compute mean, err for all seeds combined
         mean_total = mean(mean_of_seeds)
         if len(err_of_seeds) > 0:
-            err_total = stats.sem(mean_of_seeds) +\
+            err_total = stats.sem(mean_of_seeds) + \
                 add_sem(err_of_seeds) / len(err_of_seeds)
         else:
             err_total = stats.sem(mean_of_seeds)

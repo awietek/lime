@@ -12,17 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIME_ALL_H
-#define LIME_ALL_H
+#ifndef LIME_FILE_H5_DETAIL_H
+#define LIME_FILE_H5_DETAIL_H
 
+#include <string>
+#include <vector>
+#include <map>
 #include <hdf5.h>
 
-#include "file_h5.h"
-
-#include "estimator.h"
-#include "timeseries.h"
-#include "timeseries_io_h5.h"
-#include "timeseries_io_h5_lila.h"
-#include "measurements_h5.h"
+namespace lime
+namespace detail
+namespace fileh5
+{
+  void create_static_field(std::string field, int data)
+  {
+    
+  }
+  
+  
+}
 
 #endif

@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIME_ALL_H
-#define LIME_ALL_H
+#include <iostream>
+#include <random>
+#include <chrono>
 
-#include <hdf5.h>
+#include "catch.hpp"
 
-#include "file_h5.h"
+#include <lime/all.h>
 
-#include "estimator.h"
-#include "timeseries.h"
-#include "timeseries_io_h5.h"
-#include "timeseries_io_h5_lila.h"
-#include "measurements_h5.h"
-
-#endif
+TEST_CASE( "file_h5", "[file]" ) {
+  std::string filename = "test.h5";
+  auto file = lime::FileH5(filename, "r");
+}

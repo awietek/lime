@@ -9,9 +9,9 @@ endif
 
 ifeq ($(arch), awietek_osx)
 cc         = g++
-ccopt      = -O3 -mavx
+ccopt      = -O3 -mavx -DLILA_USE_ACCELERATE
 ccarch     = -std=c++11 -Wall -pedantic -m64 -Wno-return-type-c-linkage
-libraries  = -L/cm/shared/sw/pkg/devel/hdf5/1.8.21/lib -lhdf5 -lmkl_rt -DLILA_USE_MKL
+libraries  = -framework Accelerate -lhdf5
 liladir    = /Users/awietek/Research/Software/lila
 includes   = -I. -I$(liladir)
 endif

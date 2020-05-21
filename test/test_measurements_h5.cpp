@@ -28,50 +28,20 @@ TEST_CASE( "measurements_h5", "[measurements_h5]" ) {
   std::string dumpfile = "dumpm.hdf5";
   auto measurements = lime::MeasurementsH5(dumpfile);
 
-  int niters = 1000000;
+  int niters = 10;
   int dim=128;
 
   auto CLK(t1);
   for (int i=0; i<niters; ++i)
     {
-      // auto v1 = lila::Random<double>(dim);
-      // auto cv1 = lila::Random<std::complex<double>>(dim);
-      // auto m1 = lila::Random<double>(dim,dim);
-      // auto cm1 = lila::Random<std::complex<double>>(dim,dim);
-      // double s1 = v1(0);
-      // std::complex<double> cs1 = cv1(0);  
-
-      // if (i >= 9995)
-      // 	{
-      // 	  LilaPrint(s1);
-      // 	  LilaPrint(cs1);
-      // 	  LilaPrint(v1);
-      // 	  LilaPrint(cv1);
-      // 	  LilaPrint(m1);
-      // 	  LilaPrint(cm1);
-      // 	}
-
-      // measurements.add("s", s1);
-      // measurements.add("cs", cs1);
-      // measurements.add("v", v1);
-      // measurements.add("cv", cv1);
-      // measurements.add("m", m1);
-      // measurements.add("cm", cm1);
-
-
-
-      // measurements["s"] << s1;
-      // measurements["cs"] << cs1;
-      // measurements["v"] << v1;
-      // measurements["cv"] << cv1;
-      // measurements["m"] << m1;
-      // measurements["cm"] << cm1;
-
-      // measurements["s"] << 1.23;
-      // measurements.add("s", 1.23);
-
+      measurements["test"] << (double)i;
       measurements.dump();
     }
   auto CLK(t2);
+
+  // auto measurements2 = lime::ReadMeasurementsH5(dumpfile);
+
+  // REQUIRE(measurements == measurements2);
+  
   DURATION("Time2 ", t1, t2);
 }
