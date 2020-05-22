@@ -12,27 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIME_ALL_H
-#define LIME_ALL_H
+#ifndef LIME_HDF5_UTILS_H
+#define LIME_HDF5_UTILS_H
 
+#include <vector>
+#include <complex>
+#include <string>
 #include <hdf5.h>
 
-#include "file_h5.h"
-#include "hdf5/utils.h"
-#include "hdf5/types.h"
-#include "hdf5/create_static_field.h"
-#include "hdf5/write_static_field.h"
-#include "hdf5/read_field.h"
-#include "hdf5/write_compatible.h"
-#include "hdf5/read_compatible.h"
-#include "hdf5/field_type_string.h"
-#include "hdf5/parse_file.h"
+namespace lime { namespace hdf5 {
 
-
-#include "estimator.h"
-#include "timeseries.h"
-#include "timeseries_io_h5.h"
-#include "timeseries_io_h5_lila.h"
-#include "measurements_h5.h"
-
+std::vector<hsize_t> dataspace_dims(hid_t dataset_id);
+    
+}}
 #endif

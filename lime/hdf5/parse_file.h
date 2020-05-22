@@ -12,24 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIME_FILE_H5_DETAIL_H
-#define LIME_FILE_H5_DETAIL_H
+#ifndef LIME_HDF5_PARSE_FILE_H
+#define LIME_HDF5_PARSE_FILE_H
 
-#include <string>
-#include <vector>
-#include <map>
 #include <hdf5.h>
 
-namespace lime
-namespace detail
-namespace fileh5
-{
-  void create_static_field(std::string field, int data)
-  {
-    
-  }
-  
-  
-}
+namespace lime { namespace hdf5 {
+herr_t parse_file(hid_t loc_id, const char *name, const H5O_info_t *info,
+		  void *fileh5);
+}}
 
 #endif

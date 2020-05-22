@@ -12,33 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIME_FILE_H5_DETAIL_H
-#define LIME_FILE_H5_DETAIL_H
+#ifndef LIME_FILE_H5_H
+#define LIME_FILE_H5_H
 
 #include <string>
 #include <vector>
 #include <map>
 #include <hdf5.h>
 
-namespace lime::detail::fileh5
+namespace lime
 {
 
   class FileH5
   {
-    FileH5();
-    FileH5(std::string filename, std::string iomode="r");
+  public:
+    FileH5() = default;
+    operator bool() const;  // returns whether default constructed
 
-    std::string filename() const { return filename_; }
-    std::string iomode() const { return iomode_; }
-    std::vector<std::string> fields() const { return fields_; }
-    std::string field_type(std::string field) const
-    { return field_types_[field]; }
+    FileH5(std::string filename, std::string iomode="r");
+    ~FileH5() = default;
+
+    FileH5(FileH5 const& other) = delete; // FileH5 can't be copied
+    FileH5& operator=(FileH5 const& other) = delete; // FileH5 can't be copied
+
+    FileH5(FileH5&& other) = default;
+    FileH5& operator=(FileH5&& other) = default;
+    
+    inline std::string filename() const { return filename_; }
+    inline std::string iomode() const { return iomode_; }
+    inline std::vector<std::string> fields() const { return fields_; }
+    std::string field_type(std::string field) const;
     bool has_field(std::string field) const;
-    bool field_extensible(std::string field) const
-    { return field_extensible_[field];}
+    bool field_extensible(std::string field) const;
 
     template <class data_t>
     void read(std::string field, data_t& data);
+
+    friend herr_t parse_file(hid_t loc_id, const char *name,
+			     const H5O_info_t *info, void *fileh5);
     
     template <class data_t>
     void write(std::string field, data_t const& data, bool force=false);
@@ -46,13 +57,20 @@ namespace lime::detail::fileh5
     template <class data_t>
     void append(std::string field, data_t const& data);
 
+    void close();
   private:
     std::string filename_;
     std::string iomode_;
     std::vector<std::string> fields_;
     std::map<std::string, std::string> field_types_;
     std::map<std::string, bool> field_extensible_;
-  }
+
+    hid_t file_id_;
+  };
+
+  herr_t parse_file(hid_t loc_id, const char *name, const H5O_info_t *info,
+		    void *fileh5);
+
 
 }
 

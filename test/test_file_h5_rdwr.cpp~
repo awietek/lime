@@ -1,0 +1,92 @@
+// Copyright 2018 Alexander Wietek - All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <iostream>
+#include <complex>
+#include <stdio.h>
+
+
+#include "catch.hpp"
+
+#include <lime/all.h>
+
+template <class data_t>
+void test_file_h5_rdwr_single()
+{
+  std::string filename = "test_file.h5";
+  remove(filename.c_str());
+
+  auto file = lime::FileH5(filename, "w");
+
+  // Test write/read
+  data_t val1 = (data_t)42;
+  file.write("test", val1);
+  data_t val2;
+  file.read("test", val2);
+  REQUIRE(val1 == val2);
+    
+  file.close();
+  remove(filename.c_str());
+}
+
+template <class data_t>
+void test_file_h5_rdwr_vector()
+{
+  std::string filename = "test_file.h5";
+  remove(filename.c_str());
+  auto file = lime::FileH5(filename, "w");
+  auto vec1 = lila::Random<data_t>(10);
+  file.write("test", vec1);
+  auto vec2 = lila::Zeros<data_t>(10);
+  file.read("test", vec2);
+  REQUIRE(vec1 == vec2);
+
+  file.close();
+  remove(filename.c_str());
+}
+
+template <class data_t>
+void test_file_h5_rdwr_matrix()
+{
+  std::string filename = "test_file.h5";
+  remove(filename.c_str());
+  auto file = lime::FileH5(filename, "w");
+  auto mat1 = lila::Random<data_t>(10,10);
+  file.write("test", mat1);
+  auto mat2 = lila::Zeros<data_t>(10,10);
+  file.read("test", mat2);
+  REQUIRE(mat1 == mat2);
+    
+  file.close();
+  remove(filename.c_str());
+}
+
+TEST_CASE( "file_h5_rdwr", "[file]" ) {
+  test_file_h5_rdwr_single<int>();
+  test_file_h5_rdwr_single<unsigned int>();
+  test_file_h5_rdwr_single<float>();
+  test_file_h5_rdwr_single<double>();
+  test_file_h5_rdwr_single<std::complex<float>>();
+  test_file_h5_rdwr_single<std::complex<double>>();
+
+  test_file_h5_rdwr_vector<float>();
+  test_file_h5_rdwr_vector<double>();
+  test_file_h5_rdwr_vector<std::complex<float>>();
+  test_file_h5_rdwr_vector<std::complex<double>>();
+
+  test_file_h5_rdwr_matrix<float>();
+  test_file_h5_rdwr_matrix<double>();
+  test_file_h5_rdwr_matrix<std::complex<float>>();
+  test_file_h5_rdwr_matrix<std::complex<double>>();
+}

@@ -20,6 +20,8 @@
 #include <map>
 #include <hdf5.h>
 
+#include <lime/hdf5/parse_file.h>
+
 namespace lime
 {
 
@@ -38,16 +40,16 @@ namespace lime
     FileH5(FileH5&& other) = default;
     FileH5& operator=(FileH5&& other) = default;
     
-    std::string filename() const { return filename_; }
-    std::string iomode() const { return iomode_; }
-    std::vector<std::string> fields() const { return fields_; }
+    inline std::string filename() const { return filename_; }
+    inline std::string iomode() const { return iomode_; }
+    inline std::vector<std::string> fields() const { return fields_; }
     std::string field_type(std::string field) const;
     bool has_field(std::string field) const;
     bool field_extensible(std::string field) const;
 
     template <class data_t>
     void read(std::string field, data_t& data);
-    
+
     template <class data_t>
     void write(std::string field, data_t const& data, bool force=false);
 
@@ -55,6 +57,11 @@ namespace lime
     void append(std::string field, data_t const& data);
 
     void close();
+
+    
+    friend herr_t lime::hdf5::parse_file(hid_t loc_id, const char *name,
+					 const H5O_info_t *info,
+					 void *fileh5);   
   private:
     std::string filename_;
     std::string iomode_;

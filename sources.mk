@@ -1,16 +1,29 @@
 sources+= lime/file_h5.cpp
-sources+= lime/arithmetics.cpp
-sources+= lime/measurements_h5.cpp
-sources+= lime/estimator.cpp
-sources+= lime/print.cpp
-sources+= lime/timeseries.cpp
-sources+= lime/timeseries_io_h5.cpp
-sources+= lime/timeseries_io_h5_lila.cpp
-sources+= lime/detail/h5_dumper_detail.cpp
-sources+= lime/detail/h5_io_detail.cpp
-sources+= lime/detail/h5_io_detail_lila.cpp
+sources+= lime/hdf5/create_static_field.cpp
+sources+= lime/hdf5/utils.cpp
+sources+= lime/hdf5/write_compatible.cpp
+sources+= lime/hdf5/write_static_field.cpp
+sources+= lime/hdf5/read_compatible.cpp
+sources+= lime/hdf5/read_field.cpp
+sources+= lime/hdf5/parse_file.cpp
+sources+= lime/hdf5/field_type_string.cpp
+
+xsources+= lime/arithmetics.cpp
+xsources+= lime/measurements_h5.cpp
+xsources+= lime/estimator.cpp
+xsources+= lime/print.cpp
+xsources+= lime/timeseries.cpp
+xsources+= lime/timeseries_io_h5.cpp
+xsources+= lime/timeseries_io_h5_lila.cpp
+xsources+= lime/detail/h5_dumper_detail.cpp
+xsources+= lime/detail/h5_io_detail.cpp
+xsources+= lime/detail/h5_io_detail_lila.cpp
+
+
 
 testsources+= test/tests.cpp
-testsources+= test/test_estimator.cpp
-testsources+= test/test_measurements_h5.cpp
 testsources+= test/test_file_h5.cpp
+testsources+= test/test_file_h5_rdwr.cpp
+
+xtestsources+= test/test_estimator.cpp
+xtestsources+= test/test_measurements_h5.cpp
