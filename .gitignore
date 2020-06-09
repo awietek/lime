@@ -1,5 +1,6 @@
 doc/html
 .*~
+*~
 pylime/__pycache__
 *.pyc
 *.o

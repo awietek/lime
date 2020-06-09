@@ -55,7 +55,7 @@ void test_file_h5_rdwr_vector()
   file.write("test", vec1);
   file.close();
     
-  auto vec2 = lila::Zeros<data_t>(10);
+  auto vec2 = lila::Vector<data_t>();
   file = lime::FileH5(filename, "r");
   REQUIRE(file.has_field("test"));
   REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(vec1));
@@ -78,7 +78,7 @@ void test_file_h5_rdwr_matrix()
   file.write("test", mat1);
   file.close();
     
-  auto mat2 = lila::Zeros<data_t>(10,10);
+  auto mat2 = lila::Matrix<data_t>();
   file = lime::FileH5(filename, "r");
   REQUIRE(file.has_field("test"));
   REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(mat1));

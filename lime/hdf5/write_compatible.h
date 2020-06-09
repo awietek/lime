@@ -26,7 +26,7 @@ namespace lime { namespace hdf5 {
 using complex = std::complex<double>;
 using scomplex = std::complex<float>;
 
-// Functions to check field with a single entry
+// Functions to check field with a scalar entry
 bool write_compatible(hid_t file_id, std::string field, int data);
 bool write_compatible(hid_t file_id, std::string field, unsigned int data);
 bool write_compatible(hid_t file_id, std::string field, float data);

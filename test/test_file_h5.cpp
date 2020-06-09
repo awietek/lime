@@ -42,7 +42,6 @@ TEST_CASE( "file_h5", "[file]" ) {
       std::string msg = e.what();
       REQUIRE(msg.find(std::string("(r)")));
       REQUIRE(msg.find(filename));
-      std::cerr << msg << std::endl;
     }
 
   // Test opening a file in write mode
@@ -60,7 +59,6 @@ TEST_CASE( "file_h5", "[file]" ) {
       std::string msg = e.what();
       REQUIRE(msg.find(std::string("(w)")));
       REQUIRE(msg.find(filename));
-      std::cerr << msg << std::endl;
     } 
 
   // Check trying to open already opened existing file in forced
@@ -74,7 +72,6 @@ TEST_CASE( "file_h5", "[file]" ) {
       std::string msg = e.what();
       REQUIRE(msg.find(std::string("(w!)")));
       REQUIRE(msg.find(filename));
-      std::cerr << msg << std::endl;
     }
 
   // Check if overwriting file works

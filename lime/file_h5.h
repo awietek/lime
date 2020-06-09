@@ -51,14 +51,20 @@ namespace lime
     void read(std::string field, data_t& data);
 
     template <class data_t>
+    void read(std::string field, std::vector<data_t>& data);
+
+    template <class data_t>
     void write(std::string field, data_t const& data, bool force=false);
 
     template <class data_t>
     void append(std::string field, data_t const& data);
 
+    std::string attribute(std::string field, std::string attribute_name);
+    bool has_attribute(std::string field, std::string attribute_name);
+    void set_attribute(std::string field, std::string attribute_name,
+		       std::string attribute_value);
     void close();
 
-    
     friend herr_t lime::hdf5::parse_file(hid_t loc_id, const char *name,
 					 const H5O_info_t *info,
 					 void *fileh5);   

@@ -26,7 +26,7 @@ namespace lime { namespace hdf5 {
 using complex = std::complex<double>;
 using scomplex = std::complex<float>;
 
-    // Functions to write a field with a single entry
+    // Functions to write a field with a scalar entry
 void write_static_field(hid_t file_id, std::string field, int data);
 void write_static_field(hid_t file_id, std::string field, unsigned int data);
 void write_static_field(hid_t file_id, std::string field, float data);
@@ -36,23 +36,23 @@ void write_static_field(hid_t file_id, std::string field, complex data);
 
 // Functions to write a field with a lila::Vector entry
 void write_static_field(hid_t file_id, std::string field,
-			lila::Vector<float> data);
+			lila::Vector<float> const& data);
 void write_static_field(hid_t file_id, std::string field,
-			lila::Vector<double> data);
+			lila::Vector<double> const& data);
 void write_static_field(hid_t file_id, std::string field,
-			lila::Vector<scomplex> data);
+			lila::Vector<scomplex> const& data);
 void write_static_field(hid_t file_id, std::string field,
-			lila::Vector<complex> data);
+			lila::Vector<complex> const& data);
 
 // Functions to write a field with a lila::Matrix entry
 void write_static_field(hid_t file_id, std::string field,
-			lila::Matrix<float> data);
+			lila::Matrix<float> const& data);
 void write_static_field(hid_t file_id, std::string field,
-			lila::Matrix<double> data);
+			lila::Matrix<double> const& data);
 void write_static_field(hid_t file_id, std::string field,
-			lila::Matrix<scomplex> data);
+			lila::Matrix<scomplex> const& data);
 void write_static_field(hid_t file_id, std::string field,
-			lila::Matrix<complex> data);
+			lila::Matrix<complex> const& data);
 
   }}
 

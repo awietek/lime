@@ -4,9 +4,9 @@
 
 namespace lime { namespace hdf5 {
 
-// Functions to create a field with a single entry
+// Functions to create a field with a scalar entry
 template <class data_t>
-void create_static_field_single(hid_t file_id, std::string field, data_t data)
+void create_static_field_scalar(hid_t file_id, std::string field, data_t data)
 {
   hsize_t dims[1];
   dims[0] = 1; 
@@ -20,17 +20,17 @@ void create_static_field_single(hid_t file_id, std::string field, data_t data)
 }
 
 void create_static_field(hid_t file_id, std::string field, int data)
-{ create_static_field_single<int>(file_id, field, data); }
+{ create_static_field_scalar<int>(file_id, field, data); }
 void create_static_field(hid_t file_id, std::string field, unsigned int data)
-{ create_static_field_single<unsigned int>(file_id, field, data); }
+{ create_static_field_scalar<unsigned int>(file_id, field, data); }
 void create_static_field(hid_t file_id, std::string field, float data)
-{ create_static_field_single<float>(file_id, field, data); } 
+{ create_static_field_scalar<float>(file_id, field, data); } 
 void create_static_field(hid_t file_id, std::string field, double data)
-{ create_static_field_single<double>(file_id, field, data); } 
+{ create_static_field_scalar<double>(file_id, field, data); } 
 void create_static_field(hid_t file_id, std::string field, scomplex data)
-{ create_static_field_single<scomplex>(file_id, field, data); } 
+{ create_static_field_scalar<scomplex>(file_id, field, data); } 
 void create_static_field(hid_t file_id, std::string field, complex data)
-{ create_static_field_single<complex>(file_id, field, data); }
+{ create_static_field_scalar<complex>(file_id, field, data); }
 
 
 // Functions to create a field with a vector entry

@@ -106,7 +106,7 @@ def mean_err_of_data(data, quantities=None, nmins=None, nmaxs=None):
 
         mean_of_seeds = np.array(mean_of_seeds)
         err_of_seeds = np.array(err_of_seeds)
-
+        
         # Compute mean, err for all seeds combined
         mean_total = mean(mean_of_seeds)
         if len(err_of_seeds) > 0:
@@ -115,6 +115,12 @@ def mean_err_of_data(data, quantities=None, nmins=None, nmaxs=None):
         else:
             err_total = stats.sem(mean_of_seeds)
 
+        print(quantity)
+        print(mean_of_seeds)
+        print(err_of_seeds)
+        print(mean_total)
+        print(err_total)
+            
         means[quantity] = mean_total
         errs[quantity] = err_total
 

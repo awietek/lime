@@ -20,14 +20,20 @@
 #include "file_h5.h"
 #include "hdf5/utils.h"
 #include "hdf5/types.h"
-#include "hdf5/create_static_field.h"
-#include "hdf5/write_static_field.h"
-#include "hdf5/read_field.h"
-#include "hdf5/write_compatible.h"
-#include "hdf5/read_compatible.h"
 #include "hdf5/field_type_string.h"
 #include "hdf5/parse_file.h"
 
+#include "hdf5/create_static_field.h"
+#include "hdf5/create_extensible_field.h"
+
+#include "hdf5/read_static_field.h"
+#include "hdf5/read_static_compatible.h"
+
+#include "hdf5/write_static_field.h"
+#include "hdf5/write_compatible.h"
+
+#include "hdf5/append_compatible.h"
+#include "hdf5/append_extensible_field.h"
 
 #include "estimator.h"
 #include "timeseries.h"

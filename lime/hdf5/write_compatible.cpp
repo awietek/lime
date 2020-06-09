@@ -5,20 +5,20 @@
 
 namespace lime { namespace hdf5 {
 
-// Functions to create a field with a single entry
+// Functions to create a field with a scalar entry
 template <class data_t>
-bool write_compatible_single(hid_t file_id, std::string field, data_t data)
+bool write_compatible_scalar(hid_t file_id, std::string field, data_t data)
 {
   bool compatible = true;
   hid_t dataset_id = H5Dopen2(file_id, field.c_str(), H5P_DEFAULT);
   
   // Check if correct datatype
   hid_t datatype_id = H5Dget_type(dataset_id);
-  if (lime::hdf5::hdf5_datatype<data_t>() != datatype_id)
+  if (!H5Tequal(datatype_id, hdf5_datatype<data_t>()))
     compatible = false;
 
   // Check if dimensions are OK
-  auto dims = dataspace_dims(dataset_id);
+  auto dims = get_dataspace_dims(dataset_id);
   if ((dims.size() != 1) || (dims[0] != 1))
     compatible = false;
   
@@ -27,17 +27,17 @@ bool write_compatible_single(hid_t file_id, std::string field, data_t data)
 }
 
 bool write_compatible(hid_t file_id, std::string field, int data)
-{ return write_compatible_single<int>(file_id, field, data); }
+{ return write_compatible_scalar<int>(file_id, field, data); }
 bool write_compatible(hid_t file_id, std::string field, unsigned int data)
-{ return write_compatible_single<unsigned int>(file_id, field, data); }
+{ return write_compatible_scalar<unsigned int>(file_id, field, data); }
 bool write_compatible(hid_t file_id, std::string field, float data)
-{ return write_compatible_single<float>(file_id, field, data); } 
+{ return write_compatible_scalar<float>(file_id, field, data); } 
 bool write_compatible(hid_t file_id, std::string field, double data)
-{ return write_compatible_single<double>(file_id, field, data); } 
+{ return write_compatible_scalar<double>(file_id, field, data); } 
 bool write_compatible(hid_t file_id, std::string field, scomplex data)
-{ return write_compatible_single<scomplex>(file_id, field, data); } 
+{ return write_compatible_scalar<scomplex>(file_id, field, data); } 
 bool write_compatible(hid_t file_id, std::string field, complex data)
-{ return write_compatible_single<complex>(file_id, field, data); }
+{ return write_compatible_scalar<complex>(file_id, field, data); }
 
 
 // Functions to create a field with a vector entry
@@ -50,11 +50,11 @@ bool write_compatible_vector(hid_t file_id, std::string field,
   
   // Check if correct datatype
   hid_t datatype_id = H5Dget_type(dataset_id);
-  if (lime::hdf5::hdf5_datatype<data_t>() != datatype_id)
+  if (!H5Tequal(datatype_id, hdf5_datatype<data_t>()))
     compatible = false;
 
   // Check if dimensions are OK
-  auto dims = dataspace_dims(dataset_id);
+  auto dims = get_dataspace_dims(dataset_id);
   if ((dims.size() != 1) || (dims[0] != vector.size()))
     compatible = false;
   
@@ -86,11 +86,11 @@ bool write_compatible_matrix(hid_t file_id, std::string field,
   
   // Check if correct datatype
   hid_t datatype_id = H5Dget_type(dataset_id);
-  if (lime::hdf5::hdf5_datatype<data_t>() != datatype_id)
+  if (!H5Tequal(datatype_id, hdf5_datatype<data_t>()))
     compatible = false;
 
   // Check if dimensions are OK
-  auto dims = dataspace_dims(dataset_id);
+  auto dims = get_dataspace_dims(dataset_id);
   if ((dims.size() != 2) || (dims[0] != matrix.nrows()) ||
       (dims[1] != matrix.ncols()))
     compatible = false;

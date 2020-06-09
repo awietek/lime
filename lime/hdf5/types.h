@@ -20,6 +20,9 @@
 
 #include <hdf5.h>
 
+#define LIME_FIELD_TYPE_STRING "LimeFieldType"
+#define LIME_FIELD_STATIC_EXTENSIBLE_STRING "LimeFieldStaticExtensible"
+
 namespace lime { namespace hdf5 {
     
 using complex = std::complex<double>;
