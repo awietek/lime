@@ -26,6 +26,9 @@ namespace lime { namespace hdf5 {
 using complex = std::complex<double>;
 using scomplex = std::complex<float>;
 
+bool read_extensible_compatible(hid_t file_id, std::string field,
+				std::vector<std::string> const& data);
+    
 // Functions to check field with a scalar entry
 bool read_extensible_compatible(hid_t file_id, std::string field,
 				std::vector<int> const& data);

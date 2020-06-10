@@ -4,6 +4,7 @@
 
 namespace lime { namespace hdf5 {
 
+
 // Functions to create a field with a scalar entry
 template <class data_t>
 void create_extensible_field_scalar(hid_t file_id, std::string field,

@@ -16,6 +16,7 @@
 #define LIME_HDF5_TYPES_H
 
 #include <complex>
+#include <string>
 #include <cassert>
 
 #include <hdf5.h>
@@ -29,6 +30,7 @@ using complex = std::complex<double>;
 using scomplex = std::complex<float>;
 
 template <class TCoeffs> inline hid_t hdf5_datatype();
+
 template <> inline hid_t hdf5_datatype<int>()
 { return H5T_NATIVE_INT; }
 template <> inline hid_t hdf5_datatype<unsigned int>()

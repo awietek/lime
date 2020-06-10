@@ -3,7 +3,7 @@
 #include <lime/hdf5/types.h>
 
 namespace lime { namespace hdf5 {
-
+    
 // Functions to create a field with a scalar entry
 template <class data_t>
 void create_static_field_scalar(hid_t file_id, std::string field, data_t data)
@@ -18,7 +18,7 @@ void create_static_field_scalar(hid_t file_id, std::string field, data_t data)
   H5Dclose(dataset_id);
   H5Sclose(dataspace_id);
 }
-
+    
 void create_static_field(hid_t file_id, std::string field, int data)
 { create_static_field_scalar<int>(file_id, field, data); }
 void create_static_field(hid_t file_id, std::string field, unsigned int data)

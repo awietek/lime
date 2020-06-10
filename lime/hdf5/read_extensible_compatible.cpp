@@ -5,8 +5,8 @@
 #include <lime/hdf5/field_type_string.h>
 
 namespace lime { namespace hdf5 {
-
-// Functions to create a field with a scalar entry
+    
+// Functions for a scalar entry
 template <class data_t>
 bool read_extensible_compatible_scalar(hid_t file_id, std::string field)
 {

@@ -33,7 +33,6 @@ const std::vector<std::string> all_lime_field_types
    "FloatMatrix", "DoubleMatrix", "ScomplexMatrix", "ComplexMatrix"
   };
 
-    
 inline std::string field_type_string(int data)
 { return "IntScalar"; }
 inline std::string field_type_string(unsigned int data)

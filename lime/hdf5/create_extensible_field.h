@@ -21,6 +21,9 @@
 
 #include <lila/all.h>
 
+#ifndef LIME_STRING_CHUNK_SIZE
+#define LIME_STRING_CHUNK_SIZE 10
+#endif
 #ifndef LIME_SCALAR_CHUNK_SIZE
 #define LIME_SCALAR_CHUNK_SIZE 100
 #endif
@@ -35,7 +38,7 @@ namespace lime { namespace hdf5 {
 
 using complex = std::complex<double>;
 using scomplex = std::complex<float>;
-
+    
 // Functions to create a field with a scalar entry
 void create_extensible_field(hid_t file_id, std::string field, int data,
 			     hsize_t chunk_size=LIME_SCALAR_CHUNK_SIZE);
