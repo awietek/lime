@@ -1,4 +1,5 @@
 sources+= lime/file_h5.cpp
+sources+= lime/file_h5_syntax.cpp
 sources+= lime/hdf5/utils.cpp
 sources+= lime/hdf5/parse_file.cpp
 sources+= lime/hdf5/field_type_string.cpp

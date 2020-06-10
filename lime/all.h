@@ -18,9 +18,12 @@
 #include <hdf5.h>
 
 #include "file_h5.h"
+#include "file_h5_syntax.h"
+#include "type_string.h"
+#include "measurements.h"
+
 #include "hdf5/utils.h"
 #include "hdf5/types.h"
-#include "hdf5/field_type_string.h"
 #include "hdf5/parse_file.h"
 
 #include "hdf5/create_static_field.h"

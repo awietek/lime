@@ -20,11 +20,13 @@
 #include <map>
 #include <hdf5.h>
 
+#include <lime/hdf5/file_h5_syntax.h>
 #include <lime/hdf5/parse_file.h>
 
 namespace lime
 {
-
+  class FileH5SyntaxHandler;
+  
   class FileH5
   {
   public:
@@ -63,6 +65,10 @@ namespace lime
     bool has_attribute(std::string field, std::string attribute_name);
     void set_attribute(std::string field, std::string attribute_name,
 		       std::string attribute_value);
+
+    FileH5SyntaxHandler operator[](std::string field)
+    { return FileH5SyntaxHandler(field, *this); }
+    
     void close();
 
     friend herr_t lime::hdf5::parse_file(hid_t loc_id, const char *name,
