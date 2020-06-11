@@ -48,7 +48,9 @@ TEST_CASE( "file_h5", "[file]" ) {
   remove(filename.c_str());
   auto file = lime::FileH5(filename, "w");
   REQUIRE(file);
-
+  REQUIRE(lime::exists(filename));
+  REQUIRE(lime::is_hdf5(filename));
+  
   // Check trying to open existing file in write mode throws expection
   try
     {

@@ -2,6 +2,7 @@ sources+= lime/file_h5.cpp
 sources+= lime/file_h5_handler.cpp
 sources+= lime/measurements.cpp
 sources+= lime/measurement_handler.cpp
+sources+= lime/filesystem.cpp
 
 sources+= lime/hdf5/utils.cpp
 sources+= lime/hdf5/parse_file.cpp

@@ -12,33 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LIME_ALL_H
-#define LIME_ALL_H
+#ifndef LIME_FILESYSTEM_H
+#define LIME_FILESYSTEM_H
 
-#include <hdf5.h>
+#include <string>
 
-#include "file_h5.h"
-#include "file_h5_handler.h"
-#include "measurements.h"
-#include "measurement_handler.h"
-#include "type_string.h"
-#include "types.h"
-#include "filesystem.h"
-
-#include "hdf5/utils.h"
-#include "hdf5/types.h"
-#include "hdf5/parse_file.h"
-
-#include "hdf5/create_static_field.h"
-#include "hdf5/create_extensible_field.h"
-
-#include "hdf5/read_static_field.h"
-#include "hdf5/read_static_compatible.h"
-
-#include "hdf5/write_static_field.h"
-#include "hdf5/write_compatible.h"
-
-#include "hdf5/append_compatible.h"
-#include "hdf5/append_extensible_field.h"
+namespace lime
+{
+  bool exists(std::string filename);
+  bool is_hdf5(std::string filename);
+}
 
 #endif
