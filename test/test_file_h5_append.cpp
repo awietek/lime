@@ -22,7 +22,7 @@
 #include <lime/all.h>
 
 template <class data_t>
-void test_file_h5_append_single()
+void test_file_h5_append_scalar()
 {
   std::string filename = "test_file.h5";
   remove(filename.c_str());
@@ -30,30 +30,30 @@ void test_file_h5_append_single()
   data_t val1 = (data_t)42;
   data_t val2 = (data_t)43;
   auto file = lime::FileH5(filename, "w");
-  file.append("test", val1);
-  file.append("test", val2);
+  file["test"] << val1;
+  file["test"] << val2;
   file.close();
 
   // reopen in append mode and append
   file = lime::FileH5(filename, "a");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
   data_t val3 = (data_t)44;
   data_t val4 = (data_t)45;
   data_t val5 = (data_t)46;
-  file.append("test", val3);
-  file.append("test", val4);
-  file.append("test", val5);
+  file["test"] << val3;
+  file["test"] << val4;
+  file["test"] << val5;
   file.close();
 
   // reopen in read mode and see if all 5 values agree
   std::vector<data_t> vals;
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
-  file.read("test", vals);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
+  file["test"].read(vals);
   REQUIRE(val1 == vals[0]);
   REQUIRE(val2 == vals[1]);
   REQUIRE(val3 == vals[2]);
@@ -64,14 +64,14 @@ void test_file_h5_append_single()
 
   // Test reading
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
-  file.read("test", vals);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
+  file["test"].read(vals);
   data_t valx = (data_t)44;
   try
     {
-      file.append("test", valx);
+      file["test"] << valx;
     }
   catch (std::runtime_error e)
     {
@@ -97,30 +97,30 @@ void test_file_h5_append_vector()
   auto val1 = lila::Random<data_t>(10);
   auto val2 = lila::Random<data_t>(10);
   auto file = lime::FileH5(filename, "w");
-  file.append("test", val1);
-  file.append("test", val2);
+  file["test"] << val1;
+  file["test"] << val2;
   file.close();
 
   // reopen in append mode and append
   file = lime::FileH5(filename, "a");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
   auto val3 = lila::Random<data_t>(10);
   auto val4 = lila::Random<data_t>(10);
   auto val5 = lila::Random<data_t>(10);
-  file.append("test", val3);
-  file.append("test", val4);
-  file.append("test", val5);
+  file["test"] << val3;
+  file["test"] << val4;
+  file["test"] << val5;
   file.close();
 
   // reopen in read mode and see if all 5 values agree
   std::vector<lila::Vector<data_t>> vals;
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
-  file.read("test", vals);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
+  file["test"].read( vals);
   REQUIRE(val1 == vals[0]);
   REQUIRE(val2 == vals[1]);
   REQUIRE(val3 == vals[2]);
@@ -131,14 +131,14 @@ void test_file_h5_append_vector()
 
   // Test reading
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
-  file.read("test", vals);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
+  file["test"].read(vals);
   auto valx = lila::Random<data_t>(10);
   try
     {
-      file.append("test", valx);
+      file["test"] << valx;
     }
   catch (std::runtime_error e)
     {
@@ -164,30 +164,30 @@ void test_file_h5_append_matrix()
   auto val1 = lila::Random<data_t>(10,9);
   auto val2 = lila::Random<data_t>(10,9);
   auto file = lime::FileH5(filename, "w");
-  file.append("test", val1);
-  file.append("test", val2);
+  file["test"] << val1;
+  file["test"] << val2;
   file.close();
 
   // reopen in append mode and append
   file = lime::FileH5(filename, "a");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
   auto val3 = lila::Random<data_t>(10,9);
   auto val4 = lila::Random<data_t>(10,9);
   auto val5 = lila::Random<data_t>(10,9);
-  file.append("test", val3);
-  file.append("test", val4);
-  file.append("test", val5);
+  file["test"] << val3;
+  file["test"] << val4;
+  file["test"] << val5;
   file.close();
 
   // reopen in read mode and see if all 5 values agree
   std::vector<lila::Matrix<data_t>> vals;
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
-  file.read("test", vals);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
+  file["test"].read(vals);
   REQUIRE(val1 == vals[0]);
   REQUIRE(val2 == vals[1]);
   REQUIRE(val3 == vals[2]);
@@ -198,14 +198,14 @@ void test_file_h5_append_matrix()
 
   // Test reading
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(file.field_extensible("test"));
-  file.read("test", vals);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(file["test"].extensible());
+  file["test"].read(vals);
   auto valx = lila::Random<data_t>(10,9);
   try
     {
-      file.append("test", valx);
+      file["test"] << valx;
     }
   catch (std::runtime_error e)
     {
@@ -223,12 +223,12 @@ void test_file_h5_append_matrix()
 }
 
 TEST_CASE( "file_h5_append", "[file]" ) {
-  test_file_h5_append_single<int>();
-  test_file_h5_append_single<unsigned int>();
-  test_file_h5_append_single<float>();
-  test_file_h5_append_single<double>();
-  test_file_h5_append_single<std::complex<float>>();
-  test_file_h5_append_single<std::complex<double>>();
+  test_file_h5_append_scalar<int>();
+  test_file_h5_append_scalar<unsigned int>();
+  test_file_h5_append_scalar<float>();
+  test_file_h5_append_scalar<double>();
+  test_file_h5_append_scalar<std::complex<float>>();
+  test_file_h5_append_scalar<std::complex<double>>();
 
   test_file_h5_append_vector<float>();
   test_file_h5_append_vector<double>();

@@ -8,7 +8,7 @@ includes   = -I. -I$(liladir)
 endif
 
 ifeq ($(arch), awietek_osx)
-cc         = g++
+cc         = g++ -ferror-limit=2
 ccopt      = -O3 -mavx -DLILA_USE_ACCELERATE
 ccarch     = -std=c++11 -Wall -pedantic -m64 -Wno-return-type-c-linkage
 libraries  = -framework Accelerate -lhdf5

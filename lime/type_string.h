@@ -20,11 +20,9 @@
 #include <complex>
 #include <hdf5.h>
 
-#include <lila/all.h>
+#include <lime/types.h>
 
 namespace lime { 
-using complex = std::complex<double>;
-using scomplex = std::complex<float>;
 
 const std::vector<std::string> all_lime_field_types
   {"IntScalar", "UintScalar", "FloatScalar", "DoubleScalar",
@@ -33,66 +31,55 @@ const std::vector<std::string> all_lime_field_types
    "FloatMatrix", "DoubleMatrix","ComplexFloatMatrix", "ComplexDoubleMatrix"
   };
 
-inline std::string type_string(int data)
+inline std::string type_string(int const&){return "IntScalar";}
+inline std::string type_string(unsigned const&){return "UintScalar";}
+  
+inline std::string type_string(sscalar const&){return "FloatScalar";}
+inline std::string type_string(dscalar const&){return "DoubleScalar";}
+inline std::string type_string(cscalar const&){return "ComplexFloatScalar";}
+inline std::string type_string(zscalar const&){return "ComplexDoubleScalar";}
+
+inline std::string type_string(svector const&){return "FloatVector";}
+inline std::string type_string(dvector const&){return "DoubleVector";}
+inline std::string type_string(cvector const&){return "ComplexFloatVector";}
+inline std::string type_string(zvector const&){return "ComplexDoubleVector";}
+
+inline std::string type_string(smatrix const&){return "FloatMatrix";}
+inline std::string type_string(dmatrix const&){return "DoubleMatrix";}
+inline std::string type_string(cmatrix const&){return "ComplexFloatMatrix";}
+inline std::string type_string(zmatrix const&){return "ComplexDoubleMatrix";}
+
+
+inline std::string type_string(std::vector<int> const&)
 { return "IntScalar"; }
-inline std::string type_string(unsigned int data)
+inline std::string type_string(std::vector<unsigned int> const&)
 { return "UintScalar"; }
-inline std::string type_string(float data)
+  
+inline std::string type_string(std::vector<sscalar> const&)
 { return "FloatScalar"; }
-inline std::string type_string(double data)
+inline std::string type_string(std::vector<dscalar> const&)
 { return "DoubleScalar"; }
-inline std::string type_string(scomplex data)
+inline std::string type_string(std::vector<cscalar> const&)
 { return "ComplexFloatScalar"; }
-inline std::string type_string(complex data)
+inline std::string type_string(std::vector<zscalar> const&)
 { return "ComplexDoubleScalar"; }
 
-inline std::string type_string(lila::Vector<float> data)
+inline std::string type_string(std::vector<svector> const&)
 { return "FloatVector"; }
-inline std::string type_string(lila::Vector<double> data)
+inline std::string type_string(std::vector<dvector> const&)
 { return "DoubleVector"; }
-inline std::string type_string(lila::Vector<scomplex> data)
+inline std::string type_string(std::vector<cvector> const&)
 { return "ComplexFloatVector"; }
-inline std::string type_string(lila::Vector<complex> data)
+inline std::string type_string(std::vector<zvector> const&)
 { return "ComplexDoubleVector"; }
 
-inline std::string type_string(lila::Matrix<float> data)
+inline std::string type_string(std::vector<smatrix> const&)
 { return "FloatMatrix"; }
-inline std::string type_string(lila::Matrix<double> data)
+inline std::string type_string(std::vector<dmatrix> const&)
 { return "DoubleMatrix"; }
-inline std::string type_string(lila::Matrix<scomplex> data)
+inline std::string type_string(std::vector<cmatrix> const&)
 { return "ComplexFloatMatrix"; }
-inline std::string type_string(lila::Matrix<complex> data)
-{ return "ComplexDoubleMatrix"; }
-
-inline std::string type_string(std::vector<int> data)
-{ return "IntScalar"; }
-inline std::string type_string(std::vector<unsigned int> data)
-{ return "UintScalar"; }
-inline std::string type_string(std::vector<float> data)
-{ return "FloatScalar"; }
-inline std::string type_string(std::vector<double> data)
-{ return "DoubleScalar"; }
-inline std::string type_string(std::vector<scomplex> data)
-{ return "ComplexFloatScalar"; }
-inline std::string type_string(std::vector<complex> data)
-{ return "ComplexDoubleScalar"; }
-
-inline std::string type_string(std::vector<lila::Vector<float>> data)
-{ return "FloatVector"; }
-inline std::string type_string(std::vector<lila::Vector<double>> data)
-{ return "DoubleVector"; }
-inline std::string type_string(std::vector<lila::Vector<scomplex>> data)
-{ return "ComplexFloatVector"; }
-inline std::string type_string(std::vector<lila::Vector<complex>> data)
-{ return "ComplexDoubleVector"; }
-
-inline std::string type_string(std::vector<lila::Matrix<float>> data)
-{ return "FloatMatrix"; }
-inline std::string type_string(std::vector<lila::Matrix<double>> data)
-{ return "DoubleMatrix"; }
-inline std::string type_string(std::vector<lila::Matrix<scomplex>> data)
-{ return "ComplexFloatMatrix"; }
-inline std::string type_string(std::vector<lila::Matrix<complex>> data)
+inline std::string type_string(std::vector<zmatrix> const&)
 { return "ComplexDoubleMatrix"; }
 
     

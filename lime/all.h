@@ -18,9 +18,11 @@
 #include <hdf5.h>
 
 #include "file_h5.h"
-#include "file_h5_syntax.h"
-#include "type_string.h"
+#include "file_h5_handler.h"
 #include "measurements.h"
+#include "measurement_handler.h"
+#include "type_string.h"
+#include "types.h"
 
 #include "hdf5/utils.h"
 #include "hdf5/types.h"
@@ -37,11 +39,5 @@
 
 #include "hdf5/append_compatible.h"
 #include "hdf5/append_extensible_field.h"
-
-#include "estimator.h"
-#include "timeseries.h"
-#include "timeseries_io_h5.h"
-#include "timeseries_io_h5_lila.h"
-#include "measurements_h5.h"
 
 #endif

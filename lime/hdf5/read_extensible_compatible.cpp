@@ -2,7 +2,6 @@
 
 #include <lime/hdf5/utils.h>
 #include <lime/hdf5/types.h>
-#include <lime/hdf5/field_type_string.h>
 
 namespace lime { namespace hdf5 {
     

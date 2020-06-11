@@ -2,7 +2,7 @@
 
 #include <string>
 #include <lime/file_h5.h>
-#include <lime/hdf5/field_type_string.h>
+#include <lime/type_string.h>
 #include <lime/hdf5/types.h>
 #include <lime/hdf5/utils.h>
 

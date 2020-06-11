@@ -20,13 +20,12 @@
 #include <map>
 #include <hdf5.h>
 
-#include <lime/hdf5/file_h5_syntax.h>
 #include <lime/hdf5/parse_file.h>
+#include <lime/file_h5_handler.h>
 
 namespace lime
 {
-  class FileH5SyntaxHandler;
-  
+  class FileH5Handler;
   class FileH5
   {
   public:
@@ -45,15 +44,16 @@ namespace lime
     inline std::string filename() const { return filename_; }
     inline std::string iomode() const { return iomode_; }
     inline std::vector<std::string> fields() const { return fields_; }
-    std::string field_type(std::string field) const;
-    bool has_field(std::string field) const;
-    bool field_extensible(std::string field) const;
+
+    bool defined(std::string field) const;
+    std::string type(std::string field) const;
+    bool extensible(std::string field) const;
 
     template <class data_t>
-    void read(std::string field, data_t& data);
+    void read(std::string field, data_t& data) const;
 
     template <class data_t>
-    void read(std::string field, std::vector<data_t>& data);
+    void read(std::string field, std::vector<data_t>& data) const;
 
     template <class data_t>
     void write(std::string field, data_t const& data, bool force=false);
@@ -61,14 +61,18 @@ namespace lime
     template <class data_t>
     void append(std::string field, data_t const& data);
 
-    std::string attribute(std::string field, std::string attribute_name);
+    std::string attribute(std::string field, std::string attribute_name) const;
     bool has_attribute(std::string field, std::string attribute_name);
     void set_attribute(std::string field, std::string attribute_name,
 		       std::string attribute_value);
 
-    FileH5SyntaxHandler operator[](std::string field)
-    { return FileH5SyntaxHandler(field, *this); }
+    FileH5Handler operator[](std::string const& field)
+    { return FileH5Handler(field, *this); }
     
+    FileH5Handler operator[](const char* field)
+    { return operator[](std::string(field)); }
+
+
     void close();
 
     friend herr_t lime::hdf5::parse_file(hid_t loc_id, const char *name,
@@ -83,7 +87,6 @@ namespace lime
 
     hid_t file_id_;
   };
-
 }
 
 #endif

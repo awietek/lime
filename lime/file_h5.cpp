@@ -5,6 +5,11 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <lime/type_string.h>
+
+#include <lime/hdf5/utils.h>
+#include <lime/hdf5/types.h>
+
 #include <lime/hdf5/create_static_field.h>
 #include <lime/hdf5/read_static_field.h>
 #include <lime/hdf5/read_static_compatible.h>
@@ -16,10 +21,6 @@
 #include <lime/hdf5/read_extensible_compatible.h>
 #include <lime/hdf5/append_extensible_field.h>
 #include <lime/hdf5/append_compatible.h>
-
-#include <lime/hdf5/field_type_string.h>
-#include <lime/hdf5/utils.h>
-#include <lime/hdf5/types.h>
 
 namespace lime
 {
@@ -86,26 +87,25 @@ namespace lime
   }
 
   
-  std::string FileH5::field_type(std::string field) const
+  std::string FileH5::type(std::string field) const
   { return field_types_.at(field); }
 
-  bool FileH5::has_field(std::string field) const
+  bool FileH5::defined(std::string field) const
   {
     return std::find(fields_.begin(), fields_.end(), field) != fields_.end();
   }
 
-  bool FileH5::field_extensible(std::string field) const
+  bool FileH5::extensible(std::string field) const
   { return field_extensible_.at(field); }
 
   template <class data_t>
-  void FileH5::read(std::string field, data_t& data)
+  void FileH5::read(std::string field, data_t& data) const
   {
     // Read a field into data
-    if (has_field(field))
+    if (defined(field))
       {
 	// check if field datatype agrees with data
-	if (attribute(field, LIME_FIELD_TYPE_STRING) !=
-	    lime::hdf5::field_type_string(data))
+	if (attribute(field, LIME_FIELD_TYPE_STRING) != type_string(data))
 	  {
 	    auto msg = std::string("Lime error: wrong field type in read");
 	    throw std::runtime_error(msg);
@@ -141,20 +141,19 @@ namespace lime
   }
 
   template <class data_t>
-  void FileH5::read(std::string field, std::vector<data_t>& data)
+  void FileH5::read(std::string field, std::vector<data_t>& data) const
   {
     // Read a field into data
-    if (has_field(field))
+    if (defined(field))
       {
 	// check if field datatype agrees with data
-	if (attribute(field, LIME_FIELD_TYPE_STRING) !=
-	    lime::hdf5::field_type_string(data))
+	if (attribute(field, LIME_FIELD_TYPE_STRING) != type_string(data))
 	  {
 	    auto msg = std::string("Lime error: wrong field type in read");
 	    throw std::runtime_error(msg);
 	  }
 
-	// check if field extensibility is extensible
+	// check if is extensible
 	if (attribute(field, LIME_FIELD_STATIC_EXTENSIBLE_STRING) !=
 	    "Extensible")
 	  {
@@ -195,13 +194,13 @@ namespace lime
     else
       {
 	// Try to write to existing field
-	if (has_field(field))
+	if (defined(field))
 	  {
 	    // Write to existing field if possible
 	    if (force)
 	      {
 		// Throw error if field is extensible
-		if (field_extensible(field))
+		if (extensible(field))
 		  {
 		    auto msg = std::string("Lime error: can't write to "
 					   "extensible field. "
@@ -222,7 +221,7 @@ namespace lime
 		  }
 	      }
 
-	    // Throw error if field already exists
+	    // Throw error if field already defined
 	    else
 	      {
 		auto msg = std::string("Lime error: can't write to already "
@@ -235,7 +234,7 @@ namespace lime
 	else
 	  {
 	    fields_.push_back(field);
-	    std::string field_type = lime::hdf5::field_type_string(data);
+	    std::string field_type = type_string(data);
 	    field_types_[field] = field_type;
 	    field_extensible_[field] = false;
 	    lime::hdf5::create_static_field(file_id_, field, data);
@@ -255,10 +254,10 @@ namespace lime
     else
       {
 	// Try to write to existing field
-	if (has_field(field))
+	if (defined(field))
 	  {
 	    // Throw error if field is not extensible
-	    if (!field_extensible(field))
+	    if (!extensible(field))
 	      {
 		auto msg = std::string("Lime error: can't append to "
 				       "non-extensible field.");
@@ -281,7 +280,7 @@ namespace lime
 	else
 	  {
 	    fields_.push_back(field);
-	    std::string field_type = lime::hdf5::field_type_string(data);
+	    std::string field_type = type_string(data);
 	    field_types_[field] = field_type;
 	    field_extensible_[field] = true;
 	    lime::hdf5::create_extensible_field(file_id_, field, data);
@@ -294,10 +293,11 @@ namespace lime
   }
 
 
-  std::string FileH5::attribute(std::string field,std::string attribute_name)
+  std::string FileH5::attribute
+  (std::string field,std::string attribute_name) const
   {
     std::string attribute_value;
-    if (has_field(field))
+    if (defined(field))
       {
 	hid_t dataset_id = H5Dopen2(file_id_, field.c_str(), H5P_DEFAULT);
 
@@ -325,7 +325,7 @@ namespace lime
   bool FileH5::has_attribute(std::string field,std::string attribute_name)
   {
     bool has_it = false;
-    if (has_field(field))
+    if (defined(field))
       {
 	hid_t dataset_id = H5Dopen2(file_id_, field.c_str(), H5P_DEFAULT);
 	has_it = H5Aexists(dataset_id, attribute_name.c_str());
@@ -343,7 +343,7 @@ namespace lime
   void FileH5::set_attribute(std::string field, std::string attribute_name,
 			     std::string attribute_value)
   {
-    if (has_field(field))
+    if (defined(field))
       {
 	hid_t dataset_id = H5Dopen2(file_id_, field.c_str(), H5P_DEFAULT);
 	hid_t str_type_id = H5Tcopy(H5T_C_S1);
@@ -377,124 +377,77 @@ namespace lime
 // Write instantiations
 template void lime::FileH5::write(std::string, int const&, bool);
 template void lime::FileH5::write(std::string, unsigned const& , bool);
-template void lime::FileH5::write(std::string, float const&, bool);
-template void lime::FileH5::write(std::string, double const&, bool);
-template
-void lime::FileH5::write(std::string, std::complex<float> const&, bool);
-template
-void lime::FileH5::write(std::string, std::complex<double> const&, bool);
-template
-void lime::FileH5::write(std::string, lila::Vector<float> const&, bool);
-template
-void lime::FileH5::write(std::string, lila::Vector<double> const&, bool);
-template
-void lime::FileH5::write(std::string,
-			 lila::Vector<std::complex<float>> const&, bool);
-template
-void lime::FileH5::write(std::string,
-			 lila::Vector<std::complex<double>> const&, bool);
 
-template
-void lime::FileH5::write(std::string, lila::Matrix<float> const&, bool);
-template
-void lime::FileH5::write(std::string, lila::Matrix<double> const&, bool);
-template
-void lime::FileH5::write(std::string,
-			 lila::Matrix<std::complex<float>> const&, bool);
-template
-void lime::FileH5::write(std::string,
-			 lila::Matrix<std::complex<double>> const&, bool);
+template void lime::FileH5::write(std::string, sscalar const&, bool);
+template void lime::FileH5::write(std::string, dscalar const&, bool);
+template void lime::FileH5::write(std::string, cscalar const&, bool);
+template void lime::FileH5::write(std::string, zscalar const&, bool);
+
+template void lime::FileH5::write(std::string, svector const&, bool);
+template void lime::FileH5::write(std::string, dvector const&, bool);
+template void lime::FileH5::write(std::string, cvector const&, bool);
+template void lime::FileH5::write(std::string, zvector const&, bool);
+
+template void lime::FileH5::write(std::string, smatrix const&, bool);
+template void lime::FileH5::write(std::string, dmatrix const&, bool);
+template void lime::FileH5::write(std::string, cmatrix const&, bool);
+template void lime::FileH5::write(std::string, zmatrix const&, bool);
+
 
 // Read static instantiations
-template void lime::FileH5::read(std::string, int&);
-template void lime::FileH5::read(std::string, unsigned&);
-template void lime::FileH5::read(std::string, float&);
-template void lime::FileH5::read(std::string, double&);
-template
-void lime::FileH5::read(std::string, std::complex<float>&);
-template
-void lime::FileH5::read(std::string, std::complex<double>&);
-template
-void lime::FileH5::read(std::string, lila::Vector<float>&);
-template
-void lime::FileH5::read(std::string, lila::Vector<double>&);
-template
-void lime::FileH5::read(std::string,
-			lila::Vector<std::complex<float>>&);
-template
-void lime::FileH5::read(std::string,
-			lila::Vector<std::complex<double>>&);
+template void lime::FileH5::read(std::string, int&) const;
+template void lime::FileH5::read(std::string, unsigned&) const;
 
-template
-void lime::FileH5::read(std::string, lila::Matrix<float>&);
-template
-void lime::FileH5::read(std::string, lila::Matrix<double>&);
-template
-void lime::FileH5::read(std::string,
-			lila::Matrix<std::complex<float>>&);
-template
-void lime::FileH5::read(std::string,
-			lila::Matrix<std::complex<double>>&);
+template void lime::FileH5::read(std::string, sscalar&) const;
+template void lime::FileH5::read(std::string, dscalar&) const;
+template void lime::FileH5::read(std::string, cscalar&) const;
+template void lime::FileH5::read(std::string, zscalar&) const;
+
+template void lime::FileH5::read(std::string, svector&) const;
+template void lime::FileH5::read(std::string, dvector&) const;
+template void lime::FileH5::read(std::string, cvector&) const;
+template void lime::FileH5::read(std::string, zvector&) const;
+
+template void lime::FileH5::read(std::string, smatrix&) const;
+template void lime::FileH5::read(std::string, dmatrix&) const;
+template void lime::FileH5::read(std::string, cmatrix&) const;
+template void lime::FileH5::read(std::string, zmatrix&) const;
 
 
 // Read extensible instantiations
-template void lime::FileH5::read(std::string, std::vector<int>&);
-template void lime::FileH5::read(std::string, std::vector<unsigned>&);
-template void lime::FileH5::read(std::string, std::vector<float>&);
-template void lime::FileH5::read(std::string, std::vector<double>&);
-template
-void lime::FileH5::read(std::string, std::vector<std::complex<float>>&);
-template
-void lime::FileH5::read(std::string, std::vector<std::complex<double>>&);
-template
-void lime::FileH5::read(std::string, std::vector<lila::Vector<float>>&);
-template
-void lime::FileH5::read(std::string, std::vector<lila::Vector<double>>&);
-template
-void lime::FileH5::read(std::string,
-			std::vector<lila::Vector<std::complex<float>>>&);
-template
-void lime::FileH5::read(std::string,
-			std::vector<lila::Vector<std::complex<double>>>&);
+template void lime::FileH5::read(std::string, std::vector<int>&) const;
+template void lime::FileH5::read(std::string, std::vector<unsigned>&) const;
 
-template
-void lime::FileH5::read(std::string, std::vector<lila::Matrix<float>>&);
-template
-void lime::FileH5::read(std::string, std::vector<lila::Matrix<double>>&);
-template
-void lime::FileH5::read(std::string,
-			std::vector<lila::Matrix<std::complex<float>>>&);
-template
-void lime::FileH5::read(std::string,
-			std::vector<lila::Matrix<std::complex<double>>>&);
+template void lime::FileH5::read(std::string, std::vector<sscalar>&) const;
+template void lime::FileH5::read(std::string, std::vector<dscalar>&) const;
+template void lime::FileH5::read(std::string, std::vector<cscalar>&) const;
+template void lime::FileH5::read(std::string, std::vector<zscalar>&) const;
+
+template void lime::FileH5::read(std::string, std::vector<svector>&) const;
+template void lime::FileH5::read(std::string, std::vector<dvector>&) const;
+template void lime::FileH5::read(std::string, std::vector<cvector>&) const;
+template void lime::FileH5::read(std::string, std::vector<zvector>&) const;
+
+template void lime::FileH5::read(std::string, std::vector<smatrix>&) const;
+template void lime::FileH5::read(std::string, std::vector<dmatrix>&) const;
+template void lime::FileH5::read(std::string, std::vector<cmatrix>&) const;
+template void lime::FileH5::read(std::string, std::vector<zmatrix>&) const;
 
 // append instantiations
 template void lime::FileH5::append(std::string, int const&);
 template void lime::FileH5::append(std::string, unsigned const&);
-template void lime::FileH5::append(std::string, float const&);
-template void lime::FileH5::append(std::string, double const&);
-template
-void lime::FileH5::append(std::string, std::complex<float> const&);
-template
-void lime::FileH5::append(std::string, std::complex<double> const&);
-template
-void lime::FileH5::append(std::string, lila::Vector<float> const&);
-template
-void lime::FileH5::append(std::string, lila::Vector<double> const&);
-template
-void lime::FileH5::append(std::string,
-			  lila::Vector<std::complex<float>> const&);
-template
-void lime::FileH5::append(std::string,
-			  lila::Vector<std::complex<double>> const&);
 
-template
-void lime::FileH5::append(std::string, lila::Matrix<float> const&);
-template
-void lime::FileH5::append(std::string, lila::Matrix<double> const&);
-template
-void lime::FileH5::append(std::string,
-			  lila::Matrix<std::complex<float>> const&);
-template
-void lime::FileH5::append(std::string,
-			  lila::Matrix<std::complex<double>> const&);
+template void lime::FileH5::append(std::string, sscalar const&);
+template void lime::FileH5::append(std::string, dscalar const&);
+template void lime::FileH5::append(std::string, cscalar const&);
+template void lime::FileH5::append(std::string, zscalar const&);
+
+template void lime::FileH5::append(std::string, svector const&);
+template void lime::FileH5::append(std::string, dvector const&);
+template void lime::FileH5::append(std::string, cvector const&);
+template void lime::FileH5::append(std::string, zvector const&);
+
+template void lime::FileH5::append(std::string, smatrix const&);
+template void lime::FileH5::append(std::string, dmatrix const&);
+template void lime::FileH5::append(std::string, cmatrix const&);
+template void lime::FileH5::append(std::string, zmatrix const&);

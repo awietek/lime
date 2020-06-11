@@ -22,7 +22,7 @@
 #include <lime/all.h>
 
 template <class data_t>
-void test_file_h5_attribute_single()
+void test_file_h5_attribute_scalar()
 {
   std::string filename = "test_file.h5";
   std::string attribute_name = "namesca";
@@ -31,16 +31,16 @@ void test_file_h5_attribute_single()
   // Test write/read
   data_t val1 = (data_t)42;
   auto file = lime::FileH5(filename, "w");
-  file.write("test", val1);
-  file.set_attribute("test", attribute_name, attribute_value);
-  REQUIRE(file.has_attribute("test", attribute_name));
-  REQUIRE(file.attribute("test", attribute_name) == attribute_value);
+  file["test"] = val1;
+  file["test"].set_attribute(attribute_name, attribute_value);
+  REQUIRE(file["test"].has_attribute(attribute_name));
+  REQUIRE(file["test"].attribute(attribute_name) == attribute_value);
   file.close();
 
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.has_attribute("test", attribute_name));
-  REQUIRE(file.attribute("test", attribute_name) == attribute_value);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].has_attribute(attribute_name));
+  REQUIRE(file["test"].attribute(attribute_name) == attribute_value);
   file.close();
   remove(filename.c_str());
 }
@@ -55,16 +55,16 @@ void test_file_h5_attribute_vector()
   
   auto vec1 = lila::Random<data_t>(10);
   auto file = lime::FileH5(filename, "w");
-  file.write("test", vec1);
-  file.set_attribute("test", attribute_name, attribute_value);
-  REQUIRE(file.has_attribute("test", attribute_name));
-  REQUIRE(file.attribute("test", attribute_name) == attribute_value);
+  file["test"] = vec1;
+  file["test"].set_attribute(attribute_name, attribute_value);
+  REQUIRE(file["test"].has_attribute(attribute_name));
+  REQUIRE(file["test"].attribute(attribute_name) == attribute_value);
   file.close();
 
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.has_attribute("test", attribute_name));
-  REQUIRE(file.attribute("test", attribute_name) == attribute_value);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].has_attribute(attribute_name));
+  REQUIRE(file["test"].attribute(attribute_name) == attribute_value);
   file.close();
   remove(filename.c_str());
 }
@@ -79,27 +79,27 @@ void test_file_h5_attribute_matrix()
 
   auto mat1 = lila::Random<data_t>(10,10);
   auto file = lime::FileH5(filename, "w");
-  file.write("test", mat1);
-  file.set_attribute("test", attribute_name, attribute_value);
-  REQUIRE(file.has_attribute("test", attribute_name));
-  REQUIRE(file.attribute("test", attribute_name) == attribute_value);
+  file["test"] = mat1;
+  file["test"].set_attribute(attribute_name, attribute_value);
+  REQUIRE(file["test"].has_attribute(attribute_name));
+  REQUIRE(file["test"].attribute(attribute_name) == attribute_value);
   file.close();
 
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.has_attribute("test", attribute_name));
-  REQUIRE(file.attribute("test", attribute_name) == attribute_value);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].has_attribute(attribute_name));
+  REQUIRE(file["test"].attribute(attribute_name) == attribute_value);
   file.close();  
   remove(filename.c_str());
 }
 
 TEST_CASE( "file_h5_attribute", "[file]" ) {
-  test_file_h5_attribute_single<int>();
-  test_file_h5_attribute_single<unsigned int>();
-  test_file_h5_attribute_single<float>();
-  test_file_h5_attribute_single<double>();
-  test_file_h5_attribute_single<std::complex<float>>();
-  test_file_h5_attribute_single<std::complex<double>>();
+  test_file_h5_attribute_scalar<int>();
+  test_file_h5_attribute_scalar<unsigned int>();
+  test_file_h5_attribute_scalar<float>();
+  test_file_h5_attribute_scalar<double>();
+  test_file_h5_attribute_scalar<std::complex<float>>();
+  test_file_h5_attribute_scalar<std::complex<double>>();
 
   test_file_h5_attribute_vector<float>();
   test_file_h5_attribute_vector<double>();

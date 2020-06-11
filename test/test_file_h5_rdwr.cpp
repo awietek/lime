@@ -29,15 +29,15 @@ void test_file_h5_rdwr_single()
   // Test write/read
   data_t val1 = (data_t)42;
   auto file = lime::FileH5(filename, "w");
-  file.write("test", val1);
+  file["test"] = val1;
   file.close();
 
   data_t val2;
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(val1));
-  REQUIRE(!file.field_extensible("test"));
-  file.read("test", val2);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(val1));
+  REQUIRE(!file["test"].extensible());
+  file["test"].read(val2);
   file.close();
 
   REQUIRE(val1 == val2);
@@ -52,15 +52,15 @@ void test_file_h5_rdwr_vector()
   
   auto vec1 = lila::Random<data_t>(10);
   auto file = lime::FileH5(filename, "w");
-  file.write("test", vec1);
+  file["test"] = vec1;
   file.close();
     
   auto vec2 = lila::Vector<data_t>();
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(vec1));
-  REQUIRE(!file.field_extensible("test"));
-  file.read("test", vec2);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(vec1));
+  REQUIRE(!file["test"].extensible());
+  file["test"].read(vec2);
   file.close();
 
   REQUIRE(lila::equal(vec1, vec2));
@@ -75,15 +75,15 @@ void test_file_h5_rdwr_matrix()
 
   auto mat1 = lila::Random<data_t>(10,10);
   auto file = lime::FileH5(filename, "w");
-  file.write("test", mat1);
+  file["test"] = mat1;
   file.close();
     
   auto mat2 = lila::Matrix<data_t>();
   file = lime::FileH5(filename, "r");
-  REQUIRE(file.has_field("test"));
-  REQUIRE(file.field_type("test") == lime::hdf5::field_type_string(mat1));
-  REQUIRE(!file.field_extensible("test"));
-  file.read("test", mat2);
+  REQUIRE(file["test"].defined());
+  REQUIRE(file["test"].type() == lime::type_string(mat1));
+  REQUIRE(!file["test"].extensible());
+  file["test"].read(mat2);
   file.close();
     
   REQUIRE(lila::equal(mat1, mat2));    
