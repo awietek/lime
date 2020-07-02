@@ -1,4 +1,4 @@
-arch = awietek_osx
+arch = flatiron_gordon
 
 include options.mk
 include sources.mk

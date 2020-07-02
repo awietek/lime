@@ -17,7 +17,7 @@ includes   = -I. -I$(liladir)
 endif
 
 ifeq ($(arch), flatiron_gordon)
-cc         = mpicxx
+cc         = g++
 ccopt      = -O3 -mavx -DLILA_USE_MKL
 ccarch     = -std=c++11 -Wall -pedantic -m64 -Wno-return-type-c-linkage
 libraries  = -L/opt/hdf5/gnu/mvapich2_ib/lib -lhdf5 -lmkl_rt -DLILA_USE_MKL

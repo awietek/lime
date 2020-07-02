@@ -61,13 +61,13 @@ bool append_compatible_vector(hid_t file_id, std::string field,
 
   // Check if dimensions are OK
   auto dims = get_dataspace_dims(dataset_id);
-  if ((dims.size() != 2) || (dims[1] != vector.size()))
+  if ((dims.size() != 2) || (dims[1] != (hsize_t)vector.size()))
     compatible = false;
 
   // Check if max. dimensions are OK
   auto max_dims = get_dataspace_max_dims(dataset_id);
   if ((max_dims.size() != 2) || (max_dims[0] != H5S_UNLIMITED) ||
-      (max_dims[1] != vector.size()))
+      (max_dims[1] != (hsize_t)vector.size()))
     compatible = false;  
   
   H5Dclose(dataset_id);
@@ -103,14 +103,15 @@ bool append_compatible_matrix(hid_t file_id, std::string field,
 
   // Check if dimensions are OK
   auto dims = get_dataspace_dims(dataset_id);
-  if ((dims.size() != 3) || (dims[1] != matrix.nrows()) ||
-      (dims[2] != matrix.ncols()))
+  if ((dims.size() != 3) || (dims[1] != (hsize_t)matrix.nrows()) ||
+      (dims[2] != (hsize_t)matrix.ncols()))
     compatible = false;
 
   // Check if max. dimensions are OK
   auto max_dims = get_dataspace_max_dims(dataset_id);
   if ((max_dims.size() != 3) || (max_dims[0] != H5S_UNLIMITED) ||
-      (max_dims[1] != matrix.nrows()) || (max_dims[2] != matrix.ncols()))
+      (max_dims[1] != (hsize_t)matrix.nrows()) || 
+      (max_dims[2] != (hsize_t)matrix.ncols()))
     compatible = false;  
   
   H5Dclose(dataset_id);

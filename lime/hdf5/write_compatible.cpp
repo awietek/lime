@@ -55,7 +55,7 @@ bool write_compatible_vector(hid_t file_id, std::string field,
 
   // Check if dimensions are OK
   auto dims = get_dataspace_dims(dataset_id);
-  if ((dims.size() != 1) || (dims[0] != vector.size()))
+  if ((dims.size() != 1) || (dims[0] != (hsize_t)vector.size()))
     compatible = false;
   
   H5Dclose(dataset_id);
@@ -91,8 +91,8 @@ bool write_compatible_matrix(hid_t file_id, std::string field,
 
   // Check if dimensions are OK
   auto dims = get_dataspace_dims(dataset_id);
-  if ((dims.size() != 2) || (dims[0] != matrix.nrows()) ||
-      (dims[1] != matrix.ncols()))
+  if ((dims.size() != 2) || (dims[0] != (hsize_t)matrix.nrows()) ||
+      (dims[1] != (hsize_t)matrix.ncols()))
     compatible = false;
   
   H5Dclose(dataset_id);

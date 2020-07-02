@@ -89,6 +89,6 @@ herr_t parse_file(hid_t loc_id, const char *name, const H5O_info_t *info,
   //   ;
   //   // printf ("%s  (Unknown)\n", name);
   return 0;
-};
+}
 
 }}
