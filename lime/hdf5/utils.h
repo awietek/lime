@@ -25,6 +25,10 @@ namespace lime { namespace hdf5 {
 std::vector<hsize_t> get_dataspace_dims(hid_t dataset_id);
 std::vector<hsize_t> get_dataspace_max_dims(hid_t dataset_id);
 std::string get_attribute_value(hid_t dataset_id, std::string attribute_name);
+
+herr_t H5OvisitCompatible( hid_t object_id, H5_index_t index_type, H5_iter_order_t order, 
+			   H5O_iterate_t op, void *op_data );
+
   
 }}
 #endif

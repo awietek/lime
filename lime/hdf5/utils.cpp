@@ -40,5 +40,15 @@ std::string get_attribute_value(hid_t dataset_id, std::string attribute_name)
   return attribute_value;
 }
 
+
+herr_t H5OvisitCompatible( hid_t object_id, H5_index_t index_type, H5_iter_order_t order, 
+			   H5O_iterate_t op, void *op_data )
+{
+#if defined(H5Ovisit_vers) && H5Ovisit_vers == 3
+  return H5Ovisit(object_id, index_type, order, op, op_data, H5O_INFO_BASIC);
+#else
+  return H5Ovisit(object_id, index_type, order, op, op_data);
+#endif
+}
     
 }}

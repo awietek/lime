@@ -34,8 +34,8 @@ namespace lime
     if (iomode == "r")
       {
 	file_id_ = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-	H5Ovisit(file_id_, H5_INDEX_NAME, H5_ITER_NATIVE,
-		 &lime::hdf5::parse_file, this, H5O_INFO_BASIC);
+	hdf5::H5OvisitCompatible(file_id_, H5_INDEX_NAME, H5_ITER_NATIVE,
+				 &lime::hdf5::parse_file, this);
 
 	if (file_id_ < 0)
 	  {
@@ -72,8 +72,8 @@ namespace lime
     else if (iomode == "a")
       {
 	file_id_ = H5Fopen(filename.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-	H5Ovisit(file_id_, H5_INDEX_NAME, H5_ITER_NATIVE,
-		 &lime::hdf5::parse_file, this, H5O_INFO_BASIC);
+	hdf5::H5OvisitCompatible(file_id_, H5_INDEX_NAME, H5_ITER_NATIVE,
+				 &lime::hdf5::parse_file, this);
 
 	if (file_id_ < 0)
 	  {
