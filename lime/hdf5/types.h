@@ -25,28 +25,45 @@
 #define LIME_FIELD_STATIC_EXTENSIBLE_STRING "LimeFieldStaticExtensible"
 
 namespace lime { namespace hdf5 {
-    
-using complex = std::complex<double>;
-using scomplex = std::complex<float>;
+
+using lime_int = int;
+using lime_uint = unsigned int;
+using lime_long = long;
+using lime_ulong = unsigned long;
+using lime_llong = long long;
+using lime_ullong = unsigned long long;
+
+using lime_float = float;
+using lime_double = double;
+using lime_scomplex = std::complex<float>;
+using lime_complex = std::complex<double>;
 
 template <class TCoeffs> inline hid_t hdf5_datatype();
 
-template <> inline hid_t hdf5_datatype<int>()
+template <> inline hid_t hdf5_datatype<lime_int>()
 { return H5T_NATIVE_INT; }
-template <> inline hid_t hdf5_datatype<unsigned int>()
+template <> inline hid_t hdf5_datatype<lime_uint>()
 { return H5T_NATIVE_UINT; }
-template <> inline hid_t hdf5_datatype<float>()
+template <> inline hid_t hdf5_datatype<lime_long>()
+{ return H5T_NATIVE_LONG; }
+template <> inline hid_t hdf5_datatype<lime_ulong>()
+{ return H5T_NATIVE_ULONG; }
+template <> inline hid_t hdf5_datatype<lime_llong>()
+{ return H5T_NATIVE_LLONG; }
+template <> inline hid_t hdf5_datatype<lime_ullong>()
+{ return H5T_NATIVE_ULLONG; }
+template <> inline hid_t hdf5_datatype<lime_float>()
 { return H5T_NATIVE_FLOAT; }
-template <> inline hid_t hdf5_datatype<double>()
+template <> inline hid_t hdf5_datatype<lime_double>()
 { return H5T_NATIVE_DOUBLE; }
-template <> inline hid_t hdf5_datatype<scomplex>()
+template <> inline hid_t hdf5_datatype<lime_scomplex>()
 {
   hid_t memtype = H5Tcreate(H5T_COMPOUND, 2*sizeof(float));
   H5Tinsert(memtype, "r", 0*sizeof(float), H5T_NATIVE_FLOAT);
   H5Tinsert(memtype, "i", 1*sizeof(float), H5T_NATIVE_FLOAT);
   return memtype;
 }
-template <> inline hid_t hdf5_datatype<complex>()
+template <> inline hid_t hdf5_datatype<lime_complex>()
 {
   hid_t memtype = H5Tcreate(H5T_COMPOUND, 2*sizeof(double));
   H5Tinsert(memtype, "r", 0*sizeof(double), H5T_NATIVE_DOUBLE);

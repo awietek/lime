@@ -17,10 +17,11 @@
 
 #include <string>
 
-namespace lime
-{
-  bool exists(std::string filename);
-  bool is_hdf5(std::string filename);
-}
+namespace lime {
+
+bool exists(std::string filename);
+bool is_hdf5(std::string filename);
+
+} // namespace lime
 
 #endif

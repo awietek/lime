@@ -15,42 +15,42 @@
 #ifndef LIME_FILE_H5_HANDLER_H
 #define LIME_FILE_H5_HANDLER_H
 
+#include <hdf5.h>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <hdf5.h>
 
-namespace lime
-{
+namespace lime {
+
 class FileH5;
-class FileH5Handler
-  {
-  public:
-    FileH5Handler() = delete;
-    FileH5Handler(std::string field, FileH5& fileh5);
-    FileH5Handler(FileH5Handler const&) = delete;
-    FileH5Handler& operator=(FileH5Handler const&) = delete;
-    FileH5Handler(FileH5Handler&&) = default;
-    FileH5Handler& operator=(FileH5Handler&&) = default;
-    ~FileH5Handler() = default;
+class FileH5Handler {
+public:
+  FileH5Handler() = delete;
+  FileH5Handler(std::string field, FileH5 &fileh5);
+  FileH5Handler(FileH5Handler const &) = delete;
+  FileH5Handler &operator=(FileH5Handler const &) = delete;
+  FileH5Handler(FileH5Handler &&) = default;
+  FileH5Handler &operator=(FileH5Handler &&) = default;
+  ~FileH5Handler() = default;
 
-    bool defined();
-    std::string type();
-    bool extensible();
+  bool defined();
+  std::string type();
+  bool extensible();
 
-    template <class data_t> void read(data_t& data);
-    template <class data_t> void read(std::vector<data_t>& data);
-    template <class data_t> void operator<<(data_t const& data);
-    template <class data_t> void operator=(data_t const& data);
+  template <class data_t> void read(data_t &data);
+  template <class data_t> void read(std::vector<data_t> &data);
+  template <class data_t> void operator<<(data_t const &data);
+  template <class data_t> void operator=(data_t const &data);
 
-    std::string attribute(std::string attribute_name);
-    bool has_attribute(std::string attribute_name);
-    void set_attribute(std::string attribute_name,
-		       std::string attribute_value);
-  private:
-    std::string field_;
-    FileH5* fileh5_; 
-  };
-}
+  std::string attribute(std::string attribute_name);
+  bool has_attribute(std::string attribute_name);
+  void set_attribute(std::string attribute_name, std::string attribute_value);
+
+private:
+  std::string field_;
+  FileH5 *fileh5_;
+};
+
+} // namespace lime
 
 #endif

@@ -15,52 +15,61 @@
 #ifndef LIME_HDF5_READ_EXTENSIBLE_FIELD_H
 #define LIME_HDF5_READ_EXTENSIBLE_FIELD_H
 
-#include <string>
-#include <vector>
 #include <complex>
 #include <hdf5.h>
+#include <string>
+#include <vector>
 
 #include <lila/all.h>
+#include <lime/hdf5/types.h>
 
-namespace lime { namespace hdf5 {
-
-using complex = std::complex<double>;
-using scomplex = std::complex<float>;
+namespace lime {
+namespace hdf5 {
 
 // Functions to read a field with a scalar entry
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<int>& data);
+                           std::vector<lime_int> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<unsigned>& data);
+                           std::vector<lime_uint> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<float>& data);
+                           std::vector<lime_long> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<double>& data);
+                           std::vector<lime_ulong> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<scomplex>& data);
+                           std::vector<lime_llong> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<complex>& data);
+                           std::vector<lime_ullong> &data);
+
+void read_extensible_field(hid_t file_id, std::string field,
+                           std::vector<lime_float> &data);
+void read_extensible_field(hid_t file_id, std::string field,
+                           std::vector<lime_double> &data);
+void read_extensible_field(hid_t file_id, std::string field,
+                           std::vector<lime_scomplex> &data);
+void read_extensible_field(hid_t file_id, std::string field,
+                           std::vector<lime_complex> &data);
 
 // Functions to read a field with a lila::Vector entry
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<lila::Vector<float>>& data);
+                           std::vector<lila::Vector<lime_float>> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<lila::Vector<double>>& data);
+                           std::vector<lila::Vector<lime_double>> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<lila::Vector<scomplex>>& data);
+                           std::vector<lila::Vector<lime_scomplex>> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<lila::Vector<complex>>& data);
+                           std::vector<lila::Vector<lime_complex>> &data);
 
 // Functions to read a field with a lila::Matrix entry
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<lila::Matrix<float>>& data);
+                           std::vector<lila::Matrix<lime_float>> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<lila::Matrix<double>>& data);
+                           std::vector<lila::Matrix<lime_double>> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<lila::Matrix<scomplex>>& data);
+                           std::vector<lila::Matrix<lime_scomplex>> &data);
 void read_extensible_field(hid_t file_id, std::string field,
-			   std::vector<lila::Matrix<complex>>& data);
+                           std::vector<lila::Matrix<lime_complex>> &data);
 
-}}
+} // namespace hdf5
+} // namespace lime
 
 #endif

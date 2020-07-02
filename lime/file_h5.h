@@ -15,78 +15,77 @@
 #ifndef LIME_FILE_H5_H
 #define LIME_FILE_H5_H
 
+#include <hdf5.h>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <hdf5.h>
 
-#include <lime/hdf5/parse_file.h>
 #include <lime/file_h5_handler.h>
+#include <lime/hdf5/parse_file.h>
 
-namespace lime
-{
-  class FileH5Handler;
-  class FileH5
-  {
-  public:
-    FileH5() = default;
-    operator bool() const;  // returns whether default constructed
+namespace lime {
 
-    FileH5(std::string filename, std::string iomode="r");
-    ~FileH5() = default;
+class FileH5Handler;
+class FileH5 {
+public:
+  FileH5() = default;
+  operator bool() const; // returns whether default constructed
 
-    FileH5(FileH5 const& other) = delete; // FileH5 can't be copied
-    FileH5& operator=(FileH5 const& other) = delete; // FileH5 can't be copied
+  FileH5(std::string filename, std::string iomode = "r");
+  ~FileH5() = default;
 
-    FileH5(FileH5&& other) = default;
-    FileH5& operator=(FileH5&& other) = default;
-    
-    inline std::string filename() const { return filename_; }
-    inline std::string iomode() const { return iomode_; }
-    inline std::vector<std::string> fields() const { return fields_; }
+  FileH5(FileH5 const &other) = delete;            // FileH5 can't be copied
+  FileH5 &operator=(FileH5 const &other) = delete; // FileH5 can't be copied
 
-    bool defined(std::string field) const;
-    std::string type(std::string field) const;
-    bool extensible(std::string field) const;
+  FileH5(FileH5 &&other) = default;
+  FileH5 &operator=(FileH5 &&other) = default;
 
-    template <class data_t>
-    void read(std::string field, data_t& data) const;
+  inline std::string filename() const { return filename_; }
+  inline std::string iomode() const { return iomode_; }
+  inline std::vector<std::string> fields() const { return fields_; }
 
-    template <class data_t>
-    void read(std::string field, std::vector<data_t>& data) const;
+  bool defined(std::string field) const;
+  std::string type(std::string field) const;
+  bool extensible(std::string field) const;
 
-    template <class data_t>
-    void write(std::string field, data_t const& data, bool force=false);
+  template <class data_t> void read(std::string field, data_t &data) const;
 
-    template <class data_t>
-    void append(std::string field, data_t const& data);
+  template <class data_t>
+  void read(std::string field, std::vector<data_t> &data) const;
 
-    std::string attribute(std::string field, std::string attribute_name) const;
-    bool has_attribute(std::string field, std::string attribute_name);
-    void set_attribute(std::string field, std::string attribute_name,
-		       std::string attribute_value);
+  template <class data_t>
+  void write(std::string field, data_t const &data, bool force = false);
 
-    FileH5Handler operator[](std::string const& field)
-    { return FileH5Handler(field, *this); }
-    
-    FileH5Handler operator[](const char* field)
-    { return operator[](std::string(field)); }
+  template <class data_t> void append(std::string field, data_t const &data);
 
+  std::string attribute(std::string field, std::string attribute_name) const;
+  bool has_attribute(std::string field, std::string attribute_name);
+  void set_attribute(std::string field, std::string attribute_name,
+                     std::string attribute_value);
 
-    void close();
+  FileH5Handler operator[](std::string const &field) {
+    return FileH5Handler(field, *this);
+  }
 
-    friend herr_t lime::hdf5::parse_file(hid_t loc_id, const char *name,
-					 const H5O_info_t *info,
-					 void *fileh5);   
-  private:
-    std::string filename_;
-    std::string iomode_;
-    std::vector<std::string> fields_;
-    std::map<std::string, std::string> field_types_;
-    std::map<std::string, bool> field_extensible_;
+  FileH5Handler operator[](const char *field) {
+    return operator[](std::string(field));
+  }
 
-    hid_t file_id_;
-  };
-}
+  void close();
+
+  friend herr_t lime::hdf5::parse_file(hid_t loc_id, const char *name,
+                                       const H5O_info_t *info, void *fileh5);
+
+private:
+  std::string filename_;
+  std::string iomode_;
+  std::vector<std::string> fields_;
+  std::map<std::string, std::string> field_types_;
+  std::map<std::string, bool> field_extensible_;
+
+  hid_t file_id_;
+};
+
+} // namespace lime
 
 #endif

@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
 #include <complex>
+#include <iostream>
 #include <stdio.h>
-
 
 #include "catch.hpp"
 
 #include <lime/all.h>
 
-template <class data_t>
-void test_file_h5_append_scalar()
-{
+template <class data_t> void test_file_h5_append_scalar() {
   std::string filename = "test_file.h5";
   remove(filename.c_str());
   // Test write/read
@@ -61,7 +58,6 @@ void test_file_h5_append_scalar()
   REQUIRE(val5 == vals[4]);
   file.close();
 
-
   // Test reading
   file = lime::FileH5(filename, "r");
   REQUIRE(file["test"].defined());
@@ -69,28 +65,23 @@ void test_file_h5_append_scalar()
   REQUIRE(file["test"].extensible());
   file["test"].read(vals);
   data_t valx = (data_t)44;
-  try
-    {
-      file["test"] << valx;
-    }
-  catch (std::runtime_error e)
-    {
-      std::string msg = e.what();
-      REQUIRE(msg.find(std::string("cannot append in read mode")));
-    }
+  try {
+    file["test"] << valx;
+  } catch (std::runtime_error e) {
+    std::string msg = e.what();
+    REQUIRE(msg.find(std::string("cannot append in read mode")));
+  }
   REQUIRE(val1 == vals[0]);
   REQUIRE(val2 == vals[1]);
   REQUIRE(val3 == vals[2]);
   REQUIRE(val4 == vals[3]);
   REQUIRE(val5 == vals[4]);
   file.close();
-  
+
   remove(filename.c_str());
 }
 
-template <class data_t>
-void test_file_h5_append_vector()
-{
+template <class data_t> void test_file_h5_append_vector() {
   std::string filename = "test_file.h5";
   remove(filename.c_str());
   // Test write/read
@@ -120,14 +111,13 @@ void test_file_h5_append_vector()
   REQUIRE(file["test"].defined());
   REQUIRE(file["test"].type() == lime::type_string(val1));
   REQUIRE(file["test"].extensible());
-  file["test"].read( vals);
+  file["test"].read(vals);
   REQUIRE(val1 == vals[0]);
   REQUIRE(val2 == vals[1]);
   REQUIRE(val3 == vals[2]);
   REQUIRE(val4 == vals[3]);
   REQUIRE(val5 == vals[4]);
   file.close();
-
 
   // Test reading
   file = lime::FileH5(filename, "r");
@@ -136,33 +126,28 @@ void test_file_h5_append_vector()
   REQUIRE(file["test"].extensible());
   file["test"].read(vals);
   auto valx = lila::Random<data_t>(10);
-  try
-    {
-      file["test"] << valx;
-    }
-  catch (std::runtime_error e)
-    {
-      std::string msg = e.what();
-      REQUIRE(msg.find(std::string("cannot append in read mode")));
-    }
+  try {
+    file["test"] << valx;
+  } catch (std::runtime_error e) {
+    std::string msg = e.what();
+    REQUIRE(msg.find(std::string("cannot append in read mode")));
+  }
   REQUIRE(val1 == vals[0]);
   REQUIRE(val2 == vals[1]);
   REQUIRE(val3 == vals[2]);
   REQUIRE(val4 == vals[3]);
   REQUIRE(val5 == vals[4]);
   file.close();
-  
+
   remove(filename.c_str());
 }
 
-template <class data_t>
-void test_file_h5_append_matrix()
-{
+template <class data_t> void test_file_h5_append_matrix() {
   std::string filename = "test_file.h5";
   remove(filename.c_str());
   // Test write/read
-  auto val1 = lila::Random<data_t>(10,9);
-  auto val2 = lila::Random<data_t>(10,9);
+  auto val1 = lila::Random<data_t>(10, 9);
+  auto val2 = lila::Random<data_t>(10, 9);
   auto file = lime::FileH5(filename, "w");
   file["test"] << val1;
   file["test"] << val2;
@@ -173,9 +158,9 @@ void test_file_h5_append_matrix()
   REQUIRE(file["test"].defined());
   REQUIRE(file["test"].type() == lime::type_string(val1));
   REQUIRE(file["test"].extensible());
-  auto val3 = lila::Random<data_t>(10,9);
-  auto val4 = lila::Random<data_t>(10,9);
-  auto val5 = lila::Random<data_t>(10,9);
+  auto val3 = lila::Random<data_t>(10, 9);
+  auto val4 = lila::Random<data_t>(10, 9);
+  auto val5 = lila::Random<data_t>(10, 9);
   file["test"] << val3;
   file["test"] << val4;
   file["test"] << val5;
@@ -195,36 +180,37 @@ void test_file_h5_append_matrix()
   REQUIRE(val5 == vals[4]);
   file.close();
 
-
   // Test reading
   file = lime::FileH5(filename, "r");
   REQUIRE(file["test"].defined());
   REQUIRE(file["test"].type() == lime::type_string(val1));
   REQUIRE(file["test"].extensible());
   file["test"].read(vals);
-  auto valx = lila::Random<data_t>(10,9);
-  try
-    {
-      file["test"] << valx;
-    }
-  catch (std::runtime_error e)
-    {
-      std::string msg = e.what();
-      REQUIRE(msg.find(std::string("cannot append in read mode")));
-    }
+  auto valx = lila::Random<data_t>(10, 9);
+  try {
+    file["test"] << valx;
+  } catch (std::runtime_error e) {
+    std::string msg = e.what();
+    REQUIRE(msg.find(std::string("cannot append in read mode")));
+  }
   REQUIRE(val1 == vals[0]);
   REQUIRE(val2 == vals[1]);
   REQUIRE(val3 == vals[2]);
   REQUIRE(val4 == vals[3]);
   REQUIRE(val5 == vals[4]);
   file.close();
-  
+
   remove(filename.c_str());
 }
 
-TEST_CASE( "file_h5_append", "[file]" ) {
+TEST_CASE("file_h5_append", "[file]") {
   test_file_h5_append_scalar<int>();
   test_file_h5_append_scalar<unsigned int>();
+  test_file_h5_append_scalar<long>();
+  test_file_h5_append_scalar<unsigned long>();
+  test_file_h5_append_scalar<long long>();
+  test_file_h5_append_scalar<unsigned long long>();
+
   test_file_h5_append_scalar<float>();
   test_file_h5_append_scalar<double>();
   test_file_h5_append_scalar<std::complex<float>>();

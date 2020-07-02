@@ -15,45 +15,54 @@
 #ifndef LIME_HDF5_APPEND_EXTENSIBLE_FIELD_H
 #define LIME_HDF5_APPEND_EXTENSIBLE_FIELD_H
 
-#include <string>
 #include <complex>
 #include <hdf5.h>
+#include <string>
 
 #include <lila/all.h>
+#include <lime/hdf5/types.h>
 
-namespace lime { namespace hdf5 {
+namespace lime {
+namespace hdf5 {
 
-using complex = std::complex<double>;
-using scomplex = std::complex<float>;
+// Functions to write a field with a scalar entry
+void append_extensible_field(hid_t file_id, std::string field, lime_int data);
+void append_extensible_field(hid_t file_id, std::string field, lime_uint data);
+void append_extensible_field(hid_t file_id, std::string field, lime_long data);
+void append_extensible_field(hid_t file_id, std::string field, lime_ulong data);
+void append_extensible_field(hid_t file_id, std::string field, lime_llong data);
+void append_extensible_field(hid_t file_id, std::string field,
+                             lime_ullong data);
 
-    // Functions to write a field with a scalar entry
-void append_extensible_field(hid_t file_id, std::string field, int data);
-void append_extensible_field(hid_t file_id, std::string field, unsigned data);
-void append_extensible_field(hid_t file_id, std::string field, float data);
-void append_extensible_field(hid_t file_id, std::string field, double data);
-void append_extensible_field(hid_t file_id, std::string field, scomplex data);
-void append_extensible_field(hid_t file_id, std::string field, complex data);
+void append_extensible_field(hid_t file_id, std::string field, lime_float data);
+void append_extensible_field(hid_t file_id, std::string field,
+                             lime_double data);
+void append_extensible_field(hid_t file_id, std::string field,
+                             lime_scomplex data);
+void append_extensible_field(hid_t file_id, std::string field,
+                             lime_complex data);
 
 // Functions to write a field with a lila::Vector entry
 void append_extensible_field(hid_t file_id, std::string field,
-			     lila::Vector<float> const& data);
+                             lila::Vector<lime_float> const &data);
 void append_extensible_field(hid_t file_id, std::string field,
-			     lila::Vector<double> const& data);
+                             lila::Vector<lime_double> const &data);
 void append_extensible_field(hid_t file_id, std::string field,
-			     lila::Vector<scomplex> const& data);
+                             lila::Vector<lime_scomplex> const &data);
 void append_extensible_field(hid_t file_id, std::string field,
-			     lila::Vector<complex> const& data);
+                             lila::Vector<lime_complex> const &data);
 
 // Functions to write a field with a lila::Matrix entry
 void append_extensible_field(hid_t file_id, std::string field,
-			     lila::Matrix<float> const& data);
+                             lila::Matrix<lime_float> const &data);
 void append_extensible_field(hid_t file_id, std::string field,
-			     lila::Matrix<double> const& data);
+                             lila::Matrix<lime_double> const &data);
 void append_extensible_field(hid_t file_id, std::string field,
-			     lila::Matrix<scomplex> const& data);
+                             lila::Matrix<lime_scomplex> const &data);
 void append_extensible_field(hid_t file_id, std::string field,
-			     lila::Matrix<complex> const& data);
+                             lila::Matrix<lime_complex> const &data);
 
-  }}
+} // namespace hdf5
+} // namespace lime
 
 #endif

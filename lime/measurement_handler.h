@@ -15,38 +15,37 @@
 #ifndef LIME_MEASUREMENT_HANDLER_H
 #define LIME_MEASUREMENT_HANDLER_H
 
+#include <hdf5.h>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
-#include <hdf5.h>
 
-namespace lime
-{
+namespace lime {
 
 class Measurements;
-class MeasurementHandler
-  {
-  public:
-    MeasurementHandler() = delete;
-    MeasurementHandler(std::string field, Measurements& measurements);
-    MeasurementHandler(MeasurementHandler const&) = delete;
-    MeasurementHandler& operator=(MeasurementHandler const&) = delete;
-    MeasurementHandler(MeasurementHandler&&) = default;
-    MeasurementHandler& operator=(MeasurementHandler&&) = default;
-    ~MeasurementHandler() = default;
+class MeasurementHandler {
+public:
+  MeasurementHandler() = delete;
+  MeasurementHandler(std::string field, Measurements &measurements);
+  MeasurementHandler(MeasurementHandler const &) = delete;
+  MeasurementHandler &operator=(MeasurementHandler const &) = delete;
+  MeasurementHandler(MeasurementHandler &&) = default;
+  MeasurementHandler &operator=(MeasurementHandler &&) = default;
+  ~MeasurementHandler() = default;
 
-    bool defined();
-    std::string type() const;
-    long previous_dump() const;
-    long size() const;
+  bool defined();
+  std::string type() const;
+  long previous_dump() const;
+  long size() const;
 
-    template <class data_t> void get(long idx, data_t& data);
-    template <class data_t> void operator<<(data_t const& data);
-    
-  private:
-    std::string field_;
-    Measurements* measurements_; 
-  };
-}
+  template <class data_t> void get(long idx, data_t &data);
+  template <class data_t> void operator<<(data_t const &data);
+
+private:
+  std::string field_;
+  Measurements *measurements_;
+};
+
+} // namespace lime
 
 #endif

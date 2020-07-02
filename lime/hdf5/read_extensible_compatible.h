@@ -15,61 +15,68 @@
 #ifndef LIME_HDF5_READ_EXTENSIBLE_COMPATIBLE_H
 #define LIME_HDF5_READ_EXTENSIBLE_COMPATIBLE_H
 
-#include <string>
 #include <complex>
 #include <hdf5.h>
+#include <string>
 
 #include <lila/all.h>
+#include <lime/hdf5/types.h>
 
-namespace lime { namespace hdf5 {
+namespace lime {
+namespace hdf5 {
 
-using complex = std::complex<double>;
-using scomplex = std::complex<float>;
-
-bool read_extensible_compatible(hid_t file_id, std::string field,
-				std::vector<std::string> const& data);
-    
 // Functions to check field with a scalar entry
 bool read_extensible_compatible(hid_t file_id, std::string field,
-				std::vector<int> const& data);
+                                std::vector<lime_int> const &data);
 bool read_extensible_compatible(hid_t file_id, std::string field,
-				std::vector<unsigned> const&  data);
+                                std::vector<lime_uint> const &data);
 bool read_extensible_compatible(hid_t file_id, std::string field,
-				std::vector<float> const& data);
+                                std::vector<lime_long> const &data);
 bool read_extensible_compatible(hid_t file_id, std::string field,
-				std::vector<double> const& data);
+                                std::vector<lime_ulong> const &data);
 bool read_extensible_compatible(hid_t file_id, std::string field,
-				std::vector<scomplex> const& data);
+                                std::vector<lime_llong> const &data);
 bool read_extensible_compatible(hid_t file_id, std::string field,
-				std::vector<complex> const& data);
+                                std::vector<lime_ullong> const &data);
+
+bool read_extensible_compatible(hid_t file_id, std::string field,
+                                std::vector<lime_float> const &data);
+bool read_extensible_compatible(hid_t file_id, std::string field,
+                                std::vector<lime_double> const &data);
+bool read_extensible_compatible(hid_t file_id, std::string field,
+                                std::vector<lime_scomplex> const &data);
+bool read_extensible_compatible(hid_t file_id, std::string field,
+                                std::vector<lime_complex> const &data);
 
 // Functions to check a field with a lila::Vector entry
-bool read_extensible_compatible
-(hid_t file_id, std::string field,
- std::vector<lila::Vector<float>> const& data);
-bool read_extensible_compatible
-(hid_t file_id, std::string field,
- std::vector<lila::Vector<double>> const& data);
-bool read_extensible_compatible
-(hid_t file_id, std::string field,
- std::vector<lila::Vector<scomplex>> const& data);
-bool read_extensible_compatible
-(hid_t file_id, std::string field,
- std::vector<lila::Vector<complex>> const& data);
+bool read_extensible_compatible(
+    hid_t file_id, std::string field,
+    std::vector<lila::Vector<lime_float>> const &data);
+bool read_extensible_compatible(
+    hid_t file_id, std::string field,
+    std::vector<lila::Vector<lime_double>> const &data);
+bool read_extensible_compatible(
+    hid_t file_id, std::string field,
+    std::vector<lila::Vector<lime_scomplex>> const &data);
+bool read_extensible_compatible(
+    hid_t file_id, std::string field,
+    std::vector<lila::Vector<lime_complex>> const &data);
 
 // Functions to check a field with a lila::Matrix entry
-bool read_extensible_compatible
-(hid_t file_id, std::string field,
- std::vector<lila::Matrix<float>> const& data);
-bool read_extensible_compatible
-(hid_t file_id, std::string field,
- std::vector<lila::Matrix<double>> const& data);
-bool read_extensible_compatible
-(hid_t file_id, std::string field,
- std::vector<lila::Matrix<scomplex>> const& data);
-bool read_extensible_compatible
-(hid_t file_id, std::string field,
- std::vector<lila::Matrix<complex>> const& data);
-}}
+bool read_extensible_compatible(
+    hid_t file_id, std::string field,
+    std::vector<lila::Matrix<lime_float>> const &data);
+bool read_extensible_compatible(
+    hid_t file_id, std::string field,
+    std::vector<lila::Matrix<lime_double>> const &data);
+bool read_extensible_compatible(
+    hid_t file_id, std::string field,
+    std::vector<lila::Matrix<lime_scomplex>> const &data);
+bool read_extensible_compatible(
+    hid_t file_id, std::string field,
+    std::vector<lila::Matrix<lime_complex>> const &data);
+  
+} // namespace hdf5
+} // namespace lime
 
 #endif
