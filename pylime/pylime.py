@@ -49,9 +49,10 @@ def read_data(directory, regex, quantities, verbose=True):
             continue
 
         for quantity in quantities:
-            if quantity not in hf.keys():
-                raise ValueError("Couldn't find \"{}\" in seed {}".format(quantity, seed))
-            values_of_quantity_seed[quantity][seed] = hf[quantity][:] 
+            if quantity in hf.keys():
+                values_of_quantity_seed[quantity][seed] = hf[quantity][:] 
+            else:
+                print("Couldn't find \"{}\" in seed {}".format(quantity, seed))
    
     return values_of_quantity_seed
 
