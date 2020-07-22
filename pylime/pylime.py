@@ -149,6 +149,9 @@ def transform_quantity(data, source, target, function):
     Returns:
         dict of dict:  dictionary of seeds including the transformed 
     """
+    if target not in data.keys():
+        data[target] = dict()
+
     for (seed, values) in data[source].items():
         data[target][seed] = function(values)
     return data
