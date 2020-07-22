@@ -74,10 +74,11 @@ def mean_err_of_data(data, quantities=None, nmins=None, nmaxs=None):
         quantities = data.keys()
     
     for quantity in quantities:
-        mean_of_seeds = []
-        err_of_seeds = []
+        # mean_of_seeds = []
+        # err_of_seeds = []
 
         # Compute mean, error for every seed
+        all_data = []
         for seed, values in data[quantity].items():
 
             # truncate the timeseries
@@ -89,40 +90,49 @@ def mean_err_of_data(data, quantities=None, nmins=None, nmaxs=None):
                 nmax = None
             else:
                 nmax = nmaxs[seed]
-            vals = copy.deepcopy(values)[nmin:nmax]
-
-            if vals.shape[0] == 0:
-                print("Warning: empty seed {}".format(seed))
-                continue
-            elif vals.shape[0] == 1:
-                print("Warning: single entry in seed {}".format(seed))
-                m = mean(vals)
-                mean_of_seeds.append(m)
-            else:
-                e = sem(vals)
-                m = mean(vals)
-                mean_of_seeds.append(m)
-                err_of_seeds.append(e)
-
-        mean_of_seeds = np.array(mean_of_seeds)
-        err_of_seeds = np.array(err_of_seeds)
-        
-        # Compute mean, err for all seeds combined
-        mean_total = mean(mean_of_seeds)
-        if len(err_of_seeds) > 0:
-            err_total = stats.sem(mean_of_seeds) + \
-                add_sem(err_of_seeds) / len(err_of_seeds)
-        else:
-            err_total = stats.sem(mean_of_seeds)
-
-        print(quantity)
-        print(mean_of_seeds)
-        print(err_of_seeds)
-        print(mean_total)
-        print(err_total)
             
-        means[quantity] = mean_total
-        errs[quantity] = err_total
+            shape = values[nmin:nmax].shape
+            if shape[0] > 0:
+                all_data.append(values[nmin:nmax])
+
+        all_data = np.stack(all_data, axis=0)
+        means[quantity] = mean(all_data)
+        errs[quantity] = err(all_data)
+        
+        #     vals = copy.deepcopy(values)[nmin:nmax]
+
+        #     if vals.shape[0] == 0:
+        #         print("Warning: empty seed {}".format(seed))
+        #         continue
+        #     elif vals.shape[0] == 1:
+        #         print("Warning: single entry in seed {}".format(seed))
+        #         m = mean(vals)
+        #         mean_of_seeds.append(m)
+        #     else:
+        #         e = sem(vals)
+        #         m = mean(vals)
+        #         mean_of_seeds.append(m)
+        #         err_of_seeds.append(e)
+
+        # mean_of_seeds = np.array(mean_of_seeds)
+        # err_of_seeds = np.array(err_of_seeds)
+        
+        # # Compute mean, err for all seeds combined
+        # mean_total = mean(mean_of_seeds)
+        # if len(err_of_seeds) > 0:
+        #     err_total = stats.sem(mean_of_seeds) + \
+        #         add_sem(err_of_seeds) / len(err_of_seeds)
+        # else:
+        #     err_total = stats.sem(mean_of_seeds)
+
+        # print(quantity)
+        # print(mean_of_seeds)
+        # print(err_of_seeds)
+        # print(mean_total)
+        # print(err_total)
+            
+        # means[quantity] = mean_total
+        # errs[quantity] = err_total
 
     return means, errs
 
