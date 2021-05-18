@@ -78,8 +78,9 @@ void write_static_field_matrix(hid_t file_id, std::string field,
                                lila::Matrix<data_t> const &matrix) {
   hid_t dataset_id = H5Dopen2(file_id, field.c_str(), H5P_DEFAULT);
   hid_t datatype_id = hdf5_datatype<data_t>();
+  auto matrix_T = lila::Transpose(matrix);
   H5Dwrite(dataset_id, datatype_id, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-           matrix.data());
+           matrix_T.data());
   H5Dclose(dataset_id);
 }
 

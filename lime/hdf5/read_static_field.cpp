@@ -84,10 +84,10 @@ void read_static_field_matrix(hid_t file_id, std::string field,
   hid_t dataset_id = H5Dopen2(file_id, field.c_str(), H5P_DEFAULT);
   hid_t datatype_id = hdf5_datatype<data_t>();
   std::vector<hsize_t> dims = get_dataspace_dims(dataset_id);
-  matrix.clear();
-  matrix.resize(dims[0], dims[1]);
+  auto matrix_T = lila::Zeros<data_t>(dims[1], dims[0]);
   H5Dread(dataset_id, datatype_id, H5S_ALL, H5S_ALL, H5P_DEFAULT,
-          matrix.data());
+          matrix_T.data());
+  matrix = lila::Transpose(matrix_T);
   H5Dclose(dataset_id);
 }
 

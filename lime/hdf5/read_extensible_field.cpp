@@ -115,8 +115,8 @@ void read_extensible_field_matrix(hid_t file_id, std::string field,
   matrices.clear();
   matrices.resize(dims[0]);
   for (hsize_t idx = 0; idx < dims[0]; ++idx) {
-    matrices[idx].clear();
-    matrices[idx].resize(dims[1], dims[2]);
+    // matrices[idx].clear();
+    // matrices[idx].resize(dims[1], dims[2]);
 
     hid_t filespace_id = H5Dget_space(dataset_id);
     std::vector<hsize_t> offset = {idx, 0, 0};
@@ -125,8 +125,10 @@ void read_extensible_field_matrix(hid_t file_id, std::string field,
                         ext_dims.data(), NULL);
     hid_t memspace_id = H5Screate_simple(3, ext_dims.data(), NULL);
 
+    auto matrix_T = lila::Zeros<data_t>(dims[2], dims[1]);
     H5Dread(dataset_id, datatype_id, memspace_id, filespace_id, H5P_DEFAULT,
-            matrices[idx].data());
+            matrix_T.data());
+    matrices[idx] = lila::Transpose(matrix_T);
     H5Sclose(filespace_id);
     H5Sclose(memspace_id);
   }

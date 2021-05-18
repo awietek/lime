@@ -3,6 +3,13 @@
 #include <lime/hdf5/types.h>
 #include <lime/hdf5/utils.h>
 
+
+extern "C" {
+void h5dwrite_f_c(hid_t *dset_id, hid_t mem_type_id, const void *buf,
+		  hsize_t[], int hdferr, hid_t *mem_space_id,
+		  hid_t *file_space_id, hid_t *xfer_prp);
+}
+
 namespace lime {
 namespace hdf5 {
 
@@ -56,7 +63,6 @@ void append_extensible_field(hid_t file_id, std::string field,
                              lime_ullong data) {
   append_extensible_field_scalar<lime_ullong>(file_id, field, data);
 }
-  
 
 void append_extensible_field(hid_t file_id, std::string field,
                              lime_float data) {
@@ -142,9 +148,11 @@ void append_extensible_field_matrix(hid_t file_id, std::string field,
   H5Sselect_hyperslab(filespace_id, H5S_SELECT_SET, offset.data(), NULL,
                       ext_dims.data(), NULL);
   hid_t memspace_id = H5Screate_simple(3, ext_dims.data(), NULL);
-  H5Dwrite(dataset_id, datatype_id, memspace_id, filespace_id, H5P_DEFAULT,
-           matrix.data());
 
+  auto matrix_T = lila::Transpose(matrix);
+  H5Dwrite(dataset_id, datatype_id, memspace_id, filespace_id, H5P_DEFAULT,
+           matrix_T.data());
+  
   H5Sclose(memspace_id);
   H5Sclose(filespace_id);
   H5Dclose(dataset_id);
