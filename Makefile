@@ -1,4 +1,4 @@
-arch = awietek_osx
+arch = flatiron_linux
 
 include options.mk
 include sources.mk

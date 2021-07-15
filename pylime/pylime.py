@@ -96,46 +96,70 @@ def mean_err_of_data(data, quantities=None, nmins=None, nmaxs=None):
             if shape[0] > 0:
                 all_data.append(values[nmin:nmax])
 
-        all_data = np.stack(all_data, axis=0)
+        all_data = np.concatenate(all_data, axis=0)
         means[quantity] = mean(all_data)
-        errs[quantity] = err(all_data)
-        
-        #     vals = copy.deepcopy(values)[nmin:nmax]
-
-        #     if vals.shape[0] == 0:
-        #         print("Warning: empty seed {}".format(seed))
-        #         continue
-        #     elif vals.shape[0] == 1:
-        #         print("Warning: single entry in seed {}".format(seed))
-        #         m = mean(vals)
-        #         mean_of_seeds.append(m)
-        #     else:
-        #         e = sem(vals)
-        #         m = mean(vals)
-        #         mean_of_seeds.append(m)
-        #         err_of_seeds.append(e)
-
-        # mean_of_seeds = np.array(mean_of_seeds)
-        # err_of_seeds = np.array(err_of_seeds)
-        
-        # # Compute mean, err for all seeds combined
-        # mean_total = mean(mean_of_seeds)
-        # if len(err_of_seeds) > 0:
-        #     err_total = stats.sem(mean_of_seeds) + \
-        #         add_sem(err_of_seeds) / len(err_of_seeds)
-        # else:
-        #     err_total = stats.sem(mean_of_seeds)
-
-        # print(quantity)
-        # print(mean_of_seeds)
-        # print(err_of_seeds)
-        # print(mean_total)
-        # print(err_total)
-            
-        # means[quantity] = mean_total
-        # errs[quantity] = err_total
+        errs[quantity] = sem(all_data)
 
     return means, errs
+
+def mean_err_tau_of_data(data, quantities=None, nmins=None, nmaxs=None):
+    """ mean, error, aund autocorrelation time of data
+    
+    Args:
+        data:       dictionary of dictionary, quantities and seeds
+        quantities: list of quantities for which to compute mean and error
+                    (default: all means and errors are computed)
+        nmins:      dictionary containing minimum index for each seed
+        nmaxs:      dictionary containing minimum index for each seed
+    Returns:
+        3x dict:    dictionary of means, errors, and autocorrelation times  
+                    of quantities
+    """
+    means = dict()
+    errs = dict()
+    taus = dict()
+
+    if quantities == None:
+        quantities = data.keys()
+    
+    for quantity in quantities:
+
+        means[quantity] = 0
+        errs[quantity] = 0
+
+        # Compute mean, error for every seed
+        avg = dict()
+        err = dict()
+
+        taus[quantity] = max(1., autocorr_time(data[quantity]))
+
+        for seed, values in data[quantity].items():
+
+            # truncate the timeseries
+            if nmins == None:
+                nmin = 0
+            else:
+                nmin = nmins[seed]
+            if nmaxs == None:
+                nmax = None
+            else:
+                nmax = nmaxs[seed]
+            
+            series = values[nmin:nmax]
+            avg[seed] = mean(series)
+            err[seed] = sem(series)
+
+        
+        for seed in data[quantity].keys(): 
+            means[quantity] += avg[seed]
+            errs[quantity] += err[seed]**2
+
+        n_seeds = len(data[quantity].items())
+        means[quantity] /= n_seeds
+        errs[quantity] = np.sqrt(taus[quantity] * errs[quantity]) / n_seeds
+        
+    return means, errs, taus
+
 
 
 def transform_quantity(data, source, target, function):
@@ -460,7 +484,10 @@ def plot_autocorr(timeseries, nmins=None, nmaxs=None,
     for idx, (seed, data) in enumerate(timeseries.items()):
         max_time_seed = min(max_time, len(data))
         if max_time > 0:
-            auto = autocorr(data, nmins[seed])[:max_time_seed]
+            if nmins == None:
+                auto = autocorr(data, 0)[:max_time_seed]
+            else:
+                auto = autocorr(data, nmins[seed])[:max_time_seed]
             autocorrs_arr[idx, :len(auto)] = auto
 
     # Plot autocorrelations for timeseries
