@@ -8,3 +8,4 @@ pylime/__pycache__
 *.a
 test/dump.hdf5
 test/dump2.hdf5
+options.mk

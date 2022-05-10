@@ -1,3 +1,16 @@
+arch=pks
+
+ifeq ($(arch), pks)
+cc         = g++
+ccopt      = -O2 -DLILA_USE_MKL
+mkllib     = /usr/local/intel/2019.5/mkl/lib/intel64
+ccarch     = -std=c++17 -Wall -pedantic -m64 -Wno-return-type-c-linkage
+mkllib     = /usr/local/intel/2019.5/mkl/lib/intel64
+libraries  = -lhdf5 -L$(mkllib) -lmkl_intel_lp64 -lmkl_sequential -lmkl_rt -lmkl_core -lpthread -DLILA_USE_MKL
+liladir    = /home/awietek/Research/Software/lila
+includes   = -I. -I$(liladir)
+endif
+
 ifeq ($(arch), flatiron_linux)
 cc         = mpicxx
 ccopt      = -O3 -mavx -DLILA_USE_MKL

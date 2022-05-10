@@ -37,7 +37,7 @@ TEST_CASE( "file_h5", "[file]" ) {
     {
       auto fl = lime::FileH5(filename, "r");
     }
-  catch (std::runtime_error e)
+  catch (std::runtime_error const& e)
     {
       std::string msg = e.what();
       REQUIRE(msg.find(std::string("(r)")));
@@ -56,7 +56,7 @@ TEST_CASE( "file_h5", "[file]" ) {
     {
       auto fl = lime::FileH5(filename, "w");
     }
-  catch (std::runtime_error e)
+  catch (std::runtime_error const& e)
     {
       std::string msg = e.what();
       REQUIRE(msg.find(std::string("(w)")));
@@ -69,7 +69,7 @@ TEST_CASE( "file_h5", "[file]" ) {
     {
       auto fl = lime::FileH5(filename, "w!");
     }
-  catch (std::runtime_error e)
+  catch (std::runtime_error const& e)
     {
       std::string msg = e.what();
       REQUIRE(msg.find(std::string("(w!)")));

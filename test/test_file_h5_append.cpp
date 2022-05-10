@@ -67,7 +67,7 @@ template <class data_t> void test_file_h5_append_scalar() {
   data_t valx = (data_t)44;
   try {
     file["test"] << valx;
-  } catch (std::runtime_error e) {
+  } catch (std::runtime_error const& e) {
     std::string msg = e.what();
     REQUIRE(msg.find(std::string("cannot append in read mode")));
   }
@@ -128,7 +128,7 @@ template <class data_t> void test_file_h5_append_vector() {
   auto valx = lila::Random<data_t>(10);
   try {
     file["test"] << valx;
-  } catch (std::runtime_error e) {
+  } catch (std::runtime_error const& e) {
     std::string msg = e.what();
     REQUIRE(msg.find(std::string("cannot append in read mode")));
   }
@@ -189,7 +189,7 @@ template <class data_t> void test_file_h5_append_matrix() {
   auto valx = lila::Random<data_t>(10, 9);
   try {
     file["test"] << valx;
-  } catch (std::runtime_error e) {
+  } catch (std::runtime_error const& e) {
     std::string msg = e.what();
     REQUIRE(msg.find(std::string("cannot append in read mode")));
   }

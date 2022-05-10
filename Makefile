@@ -1,4 +1,4 @@
-arch = flatiron_linux
+arch = pks
 
 include options.mk
 include sources.mk
